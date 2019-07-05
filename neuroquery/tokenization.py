@@ -13,19 +13,6 @@ import numpy as np
 import pandas as pd
 from lxml import etree
 
-NAMESPACES = {
-    'corpus': ("https://gitlab.inria.fr/parietal/jerome_dockes/tree/master/"
-               "semantic_structure/corpus_manip/xml/ns#"),
-    'results': ("https://gitlab.inria.fr/parietal/jerome_dockes/"
-                "semantic_structure/results/"),
-    'prov':
-    "http://www.w3.org/ns/prov#",
-    'xhtml':
-    "http://www.w3.org/1999/xhtml",
-    'xelsevier':
-    "http://www.elsevier.com/xml/svapi/article/dtd"
-}
-
 
 WORD_PATTERN = r'(?:(?:\p{L}|\p{N}){2,}|[IVXivx0-9])'
 
@@ -296,7 +283,7 @@ class TokenizingPipeline(object):
         if self.frequencies is not None:
             freq = self.frequencies
         else:
-            freq = np.ones(self.raw_vocabulary)
+            freq = np.ones(len(self.raw_vocabulary))
         pd.Series(freq, index=self.raw_vocabulary).to_csv(
             voc_file, header=None)
         _save_voc_mapping(
@@ -414,8 +401,6 @@ def print_highlighted_text(text, replace=False):
 
 
 def load_vocabulary(vocabulary_file, token_pattern=WORD_PATTERN):
-    if vocabulary_file.endswith('.xml'):
-        return load_xml_vocabulary(vocabulary_file)
     tokenizer = Tokenizer(token_pattern=token_pattern)
     if vocabulary_file.endswith('.csv'):
         try:
@@ -438,22 +423,6 @@ def load_vocabulary(vocabulary_file, token_pattern=WORD_PATTERN):
         if tokens:
             vocabulary.append((tokens, freq))
     return vocabulary
-
-
-def load_xml_vocabulary(vocabulary_file):
-    vocabulary = etree.parse(vocabulary_file).xpath(
-        '/corpus:document/corpus:body/corpus:vocabulary',
-        namespaces=NAMESPACES)[0]
-    phrases = []
-    for phrase_entry in vocabulary.xpath(
-            'corpus:phrase-list/corpus:phrase-list-entry',
-            namespaces=NAMESPACES):
-        tokens = phrase_entry.xpath(
-            'corpus:phrase/corpus:token/text()', namespaces=NAMESPACES)
-        n_occurrences = int(phrase_entry.xpath('corpus:n-occurrences/text()',
-                                               namespaces=NAMESPACES)[0])
-        phrases.append((tuple(tokens), n_occurrences))
-    return phrases
 
 
 def tokenizing_pipeline_from_vocabulary(vocabulary,
@@ -634,6 +603,7 @@ def _similar_words(voc):
 
 
 def _choose_pairs(pairs, freq):
+    # TODO: fix
     pairs = sorted(pairs, key=lambda p: - max(freq[p[0]], freq[p[1]]))
     mapping = {}
     for a, b in pairs:
