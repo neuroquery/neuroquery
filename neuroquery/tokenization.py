@@ -41,6 +41,26 @@ _TERM_BLUE = '\033[94m'
 _TERM_GREEN = '\033[92m'
 _TERM_ENDC = '\033[0m'
 
+# not synonyms despite high jaro-winkler similarity
+_DIFFERENT_WORDS = {
+    ('addiction', 'addition'),
+    ('imitation', 'limitation'),
+    ('preference', 'reference'),
+    ('asymmetric', 'symmetric'),
+    ('mediation', 'medication'),
+    ('mediation', 'meditation'),
+    ('preferential', 'referential'),
+    ('asymptomatic', 'symptomatic'),
+    ('covert attention', 'overt attention')
+}
+
+_porter_stemmer = nltk.PorterStemmer().stem
+_word_net_lemmatizer = nltk.stem.WordNetLemmatizer().lemmatize
+
+
+def _identity(arg):
+    return arg
+
 
 def nltk_stop_words():
     with open(str(pathlib.Path(__file__).parent /
@@ -60,7 +80,6 @@ class Tokenizer(object):
         self.match_positions = None
 
     def __call__(self, text, keep_pos=False):
-        """ raw text -> list of raw tokens."""
         if keep_pos:
             return self._tokenize_keep_pos(text)
         return self._tokenize(text)
@@ -77,14 +96,6 @@ class Tokenizer(object):
             positions.append(m.span())
         self.match_positions = np.asarray(positions)
         return result
-
-
-def _identity(arg):
-    return arg
-
-
-_porter_stemmer = nltk.PorterStemmer().stem
-_word_net_lemmatizer = nltk.stem.WordNetLemmatizer().lemmatize
 
 
 def _get_stemmer(stemming_kind):
@@ -116,7 +127,6 @@ class Standardizer(object):
         return self._stemmer(str.lower(token))
 
     def __call__(self, tokens):
-        """ list of raw tokens -> list of standardized tokens."""
         return list(map(self._standardize_token, tokens))
 
 
@@ -207,7 +217,6 @@ def _extract_phrases(phrase_map, sentence, out_of_voc):
 
 
 class PhraseExtractor(object):
-    """Greedy extraction of n-grams from tokenized sentences."""
 
     def __init__(self, phrases, out_of_voc='ignore'):
         self.phrases_ = phrases
@@ -216,7 +225,6 @@ class PhraseExtractor(object):
         self.phrase_positions = None
 
     def __call__(self, sentence, keep_pos=False):
-        """ list of (standardized) tokens -> list of phrases (n-grams)"""
         if keep_pos:
             return self._extract_phrases_keep_pos(sentence)
         return _extract_phrases(self._phrase_map, sentence, self.out_of_voc_)
@@ -598,19 +606,6 @@ def add_unigram_frequencies(frequencies, unigram_op=None, voc=None):
     if unigram_op is None:
         unigram_op = unigram_operator(voc)
     return safe_sparse_dot(frequencies, unigram_op)
-
-
-_DIFFERENT_WORDS = {
-    ('addiction', 'addition'),
-    ('imitation', 'limitation'),
-    ('preference', 'reference'),
-    ('asymmetric', 'symmetric'),
-    ('mediation', 'medication'),
-    ('mediation', 'meditation'),
-    ('preferential', 'referential'),
-    ('asymptomatic', 'symptomatic'),
-    ('covert attention', 'overt attention')
-}
 
 
 def _jaro_w(a, b, jw):
