@@ -393,7 +393,7 @@ def highlight_text(text, phrases, positions, extra_info=None):
     return ''.join(snippets)
 
 
-def print_highlighted_text(text, replace=False):
+def get_printable_highlighted_text(text, replace=False):
     highlighted = etree.XML(text)
     parts = []
     for node in highlighted.xpath('child::node()'):
@@ -406,7 +406,11 @@ def print_highlighted_text(text, replace=False):
                 parts.extend([_TERM_BLUE, '[', node.text, ']', _TERM_ENDC])
         else:
             parts.append(str(node))
-    print(''.join(parts))
+    return ''.join(parts)
+
+
+def print_highlighted_text(text, replace=False):
+    print(get_printable_highlighted_text(text, replace=replace))
 
 
 def load_vocabulary(vocabulary_file, token_pattern=WORD_PATTERN):
