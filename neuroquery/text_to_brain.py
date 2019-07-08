@@ -1,12 +1,35 @@
+import pathlib
+
 import numpy as np
 from scipy import sparse
 import pandas as pd
 from sklearn.preprocessing import normalize
+from nilearn import image
 
 from neuroquery._img_utils import get_masker
+from neuroquery import tokenization, smoothed_regression
 
 
 class TextToBrain(object):
+    @classmethod
+    def from_data_dir(cls, model_dir):
+        model_dir = pathlib.Path(model_dir)
+        vectorizer = tokenization.TextVectorizer.from_vocabulary_file(
+            str(model_dir / "vocabulary.csv"), voc_mapping="auto"
+        )
+        regression = smoothed_regression.SmoothedRegression.from_data_dir(
+            str(model_dir)
+        )
+        mask_img = image.load_img(str(model_dir / "mask_img.nii.gz"))
+        return cls(vectorizer, regression, mask_img)
+
+    def to_data_dir(self, model_dir):
+        model_dir = pathlib.Path(model_dir)
+        model_dir.mkdir(parents=True, exist_ok=True)
+        self.vectorizer.to_vocabulary_file(str(model_dir / "vocabulary.csv"))
+        self.smoothed_regression.to_data_dir(model_dir)
+        self.mask_img.to_filename(str(model_dir / "mask_img.nii.gz"))
+
     def __init__(self, vectorizer, smoothed_regression, mask_img=None):
         self.vectorizer = vectorizer
         self.smoothed_regression = smoothed_regression

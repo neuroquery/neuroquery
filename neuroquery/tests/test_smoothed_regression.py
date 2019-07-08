@@ -1,3 +1,5 @@
+import tempfile
+
 import numpy as np
 
 from sklearn import datasets
@@ -36,3 +38,9 @@ def test_z_maps():
     reg = smoothed_regression.SmoothedRegression(n_components=5).fit(X, Y)
     z = reg.transform_to_z_maps(X)
     assert z.shape == Y.shape
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        reg.to_data_dir(tmp_dir)
+        loaded = smoothed_regression.SmoothedRegression.from_data_dir(tmp_dir)
+        assert np.allclose(
+            loaded.transform_to_z_maps(X), reg.transform_to_z_maps(X)
+        )

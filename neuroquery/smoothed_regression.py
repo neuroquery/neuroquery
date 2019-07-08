@@ -1,9 +1,39 @@
+import pathlib
+
 from sklearn.base import BaseEstimator, RegressorMixin
 
 from neuroquery import ridge, nmf
 
 
 class SmoothedRegression(BaseEstimator, RegressorMixin):
+    @classmethod
+    def from_data_dir(cls, model_dir):
+        model_dir = pathlib.Path(model_dir)
+        smoothing_dir = model_dir / "smoothing"
+        smoothing = nmf.CovarianceSmoothing.from_data_dir(smoothing_dir)
+        regression_dir = model_dir / "regression"
+        regression = ridge.FittedLinearModel.from_data_dir(regression_dir)
+        model = cls(
+            alphas=None,
+            n_components=smoothing.n_components,
+            smoothing_weight=smoothing.smoothing_weight,
+        )
+        model.smoothing_ = smoothing
+        model.regression_ = regression
+        return model
+
+    def to_data_dir(self, model_dir):
+        model_dir = pathlib.Path(model_dir)
+        model_dir.mkdir(parents=True, exist_ok=True)
+        smoothing_dir = model_dir / "smoothing"
+        smoothing_dir.mkdir()
+        self.smoothing_.to_data_dir(smoothing_dir)
+        regression_dir = model_dir / "regression"
+        regression_dir.mkdir()
+        ridge.FittedLinearModel.from_model(self.regression_).to_data_dir(
+            regression_dir
+        )
+
     def __init__(
         self,
         alphas=ridge._DEFAULT_ALPHAS,

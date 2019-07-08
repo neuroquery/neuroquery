@@ -230,6 +230,7 @@ class FittedLinearModel(RidgeGCV):
 
     def to_data_dir(self, model_dir):
         model_dir = pathlib.Path(model_dir)
+        model_dir.mkdir(parents=True, exist_ok=True)
         for name in [
             "coef",
             "intercept",

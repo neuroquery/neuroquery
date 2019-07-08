@@ -1,3 +1,5 @@
+import tempfile
+
 import numpy as np
 from sklearn import datasets
 from nibabel.nifti1 import Nifti1Image
@@ -37,7 +39,8 @@ def test_text_to_brain():
     encoder = text_to_brain.TextToBrain(
         vect, reg, mask_img=_mask_img(y.shape[1])
     )
-    res = encoder("feature0 and feature8 but not feature73")
+    text = "feature0 and feature8 but not feature73"
+    res = encoder(text)
     simil = res["similar_words"]
     assert simil.loc["feature0"]["similarity"] != 0
     assert simil.loc["feature0"]["weight_in_brain_map"] != 0
@@ -47,3 +50,8 @@ def test_text_to_brain():
     assert simil.loc["feature8"]["weight_in_brain_map"] == pytest.approx(0)
     assert simil.loc["feature18"]["weight_in_brain_map"] == pytest.approx(0)
     assert simil.loc["feature18"]["weight_in_query"] == pytest.approx(0)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        encoder.to_data_dir(tmp_dir)
+        loaded = text_to_brain.TextToBrain.from_data_dir(tmp_dir)
+        encoded = loaded(text)["z_map"].get_data()
+        assert np.allclose(encoded, res["z_map"].get_data())

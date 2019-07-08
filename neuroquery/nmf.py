@@ -27,6 +27,7 @@ class CovarianceSmoothing(BaseEstimator, TransformerMixin):
     @classmethod
     def from_data_dir(cls, model_dir):
         model_dir = pathlib.Path(model_dir)
+        model_dir.mkdir(parents=True, exist_ok=True)
         V = np.load(str(model_dir / "V.npy"))
         sw = np.load(str(model_dir / "smoothing_weight.npy"))
         n_components = V.shape[1]
