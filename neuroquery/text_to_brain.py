@@ -54,6 +54,7 @@ class TextToBrain(object):
     def transform(self, documents):
         raw_tfidf = self.vectorizer.transform(documents)
         raw_tfidf = normalize(raw_tfidf, copy=False)
+        self.smoothed_regression.regression_.intercept_ = 0.
         z_scores = self.smoothed_regression.transform_to_z_maps(raw_tfidf)
         masker = self._get_masker()
         z_maps_unmasked = list(map(masker.inverse_transform, z_scores))
