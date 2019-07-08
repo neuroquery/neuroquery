@@ -32,7 +32,7 @@ def _gcv(U, s, Y, intercept, alphas):
         scale = 1 - np.diag(hat)
         batch_size = np.maximum(1, Y.shape[1] // 10)
         for batch in range(0, Y.shape[1], batch_size):
-            target = Y[:, batch: batch + batch_size]
+            target = Y[:, batch : batch + batch_size]
             err = (target - hat.dot(target)) / scale[:, None]
             errors[i] += np.sum(err ** 2, axis=1)
     return errors
@@ -159,17 +159,17 @@ class SelectiveRidge(RidgeGCV):
         adapt = AdaptiveRidge(
             alphas=self.alphas, use_positive_part=self.use_positive_part
         ).fit(X, Y)
-        self.kept_features_ = np.arange(X.shape[1])[
+        self.selected_features_ = np.arange(X.shape[1])[
             adapt.feat_penalty_ < adapt.feat_penalty_.max()
         ]
-        self.feat_penalty_ = adapt.feat_penalty_[self.kept_features_]
+        self.feat_penalty_ = adapt.feat_penalty_[self.selected_features_]
         del adapt
-        print("keeping {} features".format(len(self.kept_features_)))
-        super().fit(X[:, self.kept_features_], Y)
+        print("keeping {} features".format(len(self.selected_features_)))
+        super().fit(X[:, self.selected_features_], Y)
         return self
 
     def predict(self, X):
-        X = X[:, self.kept_features_]
+        X = X[:, self.selected_features_]
         return (
             safe_sparse_dot(X, self.coef_.T, dense_output=True)
             + self.intercept_
@@ -181,18 +181,18 @@ class SelectiveRidge(RidgeGCV):
         if not full:
             return z
         full_z = np.zeros((self.original_n_features_, self.coef_.shape[0]))
-        full_z[self.kept_features_] = z
+        full_z[self.selected_features_] = z
         return full_z
 
     def prediction_variance(self, X):
-        X = X[:, self.kept_features_]
+        X = X[:, self.selected_features_]
         XM = np.atleast_2d(safe_sparse_dot(X, self.M_, dense_output=True))
         XMMtXt = (XM ** 2).sum(axis=1, keepdims=True)
         return XMMtXt * self._res_var
 
     def transform_to_z_maps(self, X):
         pred_variance = self.prediction_variance(X)
-        X = X[:, self.kept_features_]
+        X = X[:, self.selected_features_]
         return safe_sparse_dot(
             X, self.coef_.T, dense_output=True
         ) / np.maximum(np.sqrt(pred_variance), 1e-24)

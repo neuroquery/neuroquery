@@ -73,9 +73,9 @@ def test_z_maps(regressor):
         z1 = reg.transform_to_z_maps(w)[0]
         z2 = reg.z_maps()[feat]
         assert np.allclose(z1, z2)
-    if hasattr(reg, "kept_features_"):
+    if hasattr(reg, "selected_features_"):
         z = reg.z_maps(full=False)
-        assert z.shape == (len(reg.kept_features_), 13)
+        assert z.shape == (len(reg.selected_features_), 13)
 
 
 @pytest.mark.parametrize(
