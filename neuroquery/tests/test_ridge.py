@@ -1,5 +1,3 @@
-import itertools
-
 import numpy as np
 from scipy import sparse
 
@@ -18,14 +16,8 @@ ALPHAS = np.logspace(-6, 6, 13)
 @pytest.mark.parametrize('n_samples', [11, 101, 301])
 def test_ridge(noise, n_samples):
     x, y = datasets.make_regression(
-        n_features=100,
-        n_targets=33,
-        effective_rank=4,
-        bias=100,
-        n_informative=7,
-        shuffle=False,
-        noise=noise,
-        n_samples=n_samples,
+        n_features=100, n_targets=33, effective_rank=4, bias=100,
+        n_informative=7, shuffle=False, noise=noise, n_samples=n_samples,
         random_state=1)
     x += 71
     y -= 370

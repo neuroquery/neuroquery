@@ -135,8 +135,6 @@ def test_extract_phrases():
     assert (all_phrases == [(tokenization.OUT_OF_VOC_TOKEN, ),
                             (tokenization.OUT_OF_VOC_TOKEN, ),
                             ('machine', 'learning'), ('algorithm', )])
-    known_phrases = tokenization._extract_phrases(phrase_map, sentence,
-                                                  'ignore')
     all_phrases = tokenization._extract_phrases(phrase_map, sentence, '[]')
     assert all_phrases == [('[the]', ), ('[new]', ),
                            ('machine', 'learning'), ('algorithm', )]
@@ -278,7 +276,8 @@ def test_highlight_text():
 
 
 def test_make_voc_mapping():
-    voc = [('experiment',), ('experiments',), ('experience'), ('experimentss',)]
+    voc = [('experiment',), ('experiments',),
+           ('experience'), ('experimentss',)]
     freq = [1., .5, .2, .01]
     voc_mapping = tokenization.make_vocabulary_mapping(voc, freq)
     assert voc_mapping == {('experiments',): ('experiment',),
