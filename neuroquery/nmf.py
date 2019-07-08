@@ -7,8 +7,13 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 def _smoothing_matrix_sqrt(X, n_components=300):
     nmf = NMF(
-        n_components=n_components, max_iter=200,
-        random_state=0, alpha=1e-1, l1_ratio=.1, verbose=0)
+        n_components=n_components,
+        max_iter=200,
+        random_state=0,
+        alpha=1e-1,
+        l1_ratio=0.1,
+        verbose=0,
+    )
     u = nmf.fit_transform(X)
     v = nmf.components_.T
     z = np.linalg.norm(u, axis=0)
@@ -17,8 +22,7 @@ def _smoothing_matrix_sqrt(X, n_components=300):
 
 
 class CovarianceSmoothing(BaseEstimator, TransformerMixin):
-
-    def __init__(self, n_components=300, smoothing_weight=.1):
+    def __init__(self, n_components=300, smoothing_weight=0.1):
         self.n_components = n_components
         self.smoothing_weight = smoothing_weight
 
@@ -35,5 +39,6 @@ class CovarianceSmoothing(BaseEstimator, TransformerMixin):
         if sparse.issparse(X):
             X = X.A
         s = np.einsum(
-            'ij,jk,lk', X, self.normalized_V_, self.V_, optimize=True)
+            "ij,jk,lk", X, self.normalized_V_, self.V_, optimize=True
+        )
         return self.smoothing_weight * s + (1 - self.smoothing_weight) * X

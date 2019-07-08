@@ -20,7 +20,8 @@ def test_predictions():
     )
     x -= x.min() - 1
     reg = smoothed_regression.SmoothedRegression(
-        n_components=5, smoothing_weight=1e-3)
+        n_components=5, smoothing_weight=1e-3
+    )
     print(reg.fit(x, y).predict(x))
     sk_reg = RidgeCV()
     score = cross_val_score(reg, x, y, cv=5)
@@ -30,7 +31,7 @@ def test_predictions():
 
 def test_z_maps():
     rng = np.random.RandomState(0)
-    X = rng.binomial(3, .3, size=(21, 9)).astype('float64')
+    X = rng.binomial(3, 0.3, size=(21, 9)).astype("float64")
     Y = rng.randn(21, 11)
     reg = smoothed_regression.SmoothedRegression(n_components=5).fit(X, Y)
     z = reg.transform_to_z_maps(X)
