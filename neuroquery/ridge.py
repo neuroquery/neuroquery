@@ -1,3 +1,5 @@
+import pathlib
+
 import numpy as np
 
 from scipy import linalg
@@ -166,6 +168,112 @@ class SelectiveRidge(RidgeGCV):
         del adapt
         print("keeping {} features".format(len(self.selected_features_)))
         super().fit(X[:, self.selected_features_], Y)
+        return self
+
+    def predict(self, X):
+        X = X[:, self.selected_features_]
+        return (
+            safe_sparse_dot(X, self.coef_.T, dense_output=True)
+            + self.intercept_
+        )
+
+    def z_maps(self, full=True):
+        var = np.outer(self._var_filter, self._res_var)
+        z = self.coef_.T / np.maximum(np.sqrt(var), 1e-24)
+        if not full:
+            return z
+        full_z = np.zeros((self.original_n_features_, self.coef_.shape[0]))
+        full_z[self.selected_features_] = z
+        return full_z
+
+    def prediction_variance(self, X):
+        X = X[:, self.selected_features_]
+        XM = np.atleast_2d(safe_sparse_dot(X, self.M_, dense_output=True))
+        XMMtXt = (XM ** 2).sum(axis=1, keepdims=True)
+        return XMMtXt * self._res_var
+
+    def transform_to_z_maps(self, X):
+        pred_variance = self.prediction_variance(X)
+        X = X[:, self.selected_features_]
+        return safe_sparse_dot(
+            X, self.coef_.T, dense_output=True
+        ) / np.maximum(np.sqrt(pred_variance), 1e-24)
+
+
+class FittedLinearModel(RidgeGCV):
+    @classmethod
+    def from_data_dir(cls, model_dir):
+        model_dir = pathlib.Path(model_dir)
+        kwargs = {}
+        for name in [
+            "coef",
+            "intercept",
+            "M",
+            "residual_var",
+            "selected_features",
+            "original_n_features",
+        ]:
+            if (model_dir / "{}.npy".format(name)).is_file():
+                kwargs[name] = np.load(str(model_dir / "{}.npy".format(name)))
+        return cls(**kwargs)
+
+    @classmethod
+    def from_model(cls, model):
+        return cls(
+            model.coef_,
+            model.intercept_,
+            model.M_,
+            model._res_var,
+            getattr(model, "selected_features_", None),
+            getattr(model, "original_n_features_", None),
+        )
+
+    def to_data_dir(self, model_dir):
+        model_dir = pathlib.Path(model_dir)
+        for name in [
+            "coef",
+            "intercept",
+            "M",
+            "residual_var",
+            "selected_features",
+            "original_n_features",
+        ]:
+            if getattr(self, name, None) is not None:
+                np.save(
+                    str(model_dir / "{}.npy".format(name)), getattr(self, name)
+                )
+
+    def __init__(
+        self,
+        coef,
+        intercept,
+        M,
+        residual_var,
+        selected_features=None,
+        original_n_features=None,
+    ):
+        self.coef = coef
+        self.intercept = intercept
+        self.M = M
+        self.residual_var = residual_var
+        self.selected_features = selected_features
+        self.original_n_features = original_n_features
+        self.fit()
+
+    def fit(self, X=None, y=None):
+        self.coef_ = self.coef
+        self.intercept_ = self.intercept
+        self.M_ = self.M
+        self._res_var = self.residual_var
+        if self.selected_features is not None:
+            self.selected_features_ = self.selected_features
+        else:
+            self.selected_features_ = np.arange(self.coef_.shape[1])
+        if self.original_n_features is None:
+            self.original_n_features_ = self.coef_.shape[1]
+        else:
+            self.original_n_features_ = self.original_n_features
+        self._var_filter = np.einsum("ij,ij->i", self.M_, self.M_)
         return self
 
     def predict(self, X):

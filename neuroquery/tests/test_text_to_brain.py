@@ -20,7 +20,7 @@ def _dataset_and_voc():
         random_state=0,
     )
     x -= x.min() - 1
-    voc = list(map('feature{}'.format, range(n_features)))
+    voc = list(map("feature{}".format, range(n_features)))
     return x, y, voc
 
 
@@ -34,14 +34,16 @@ def test_text_to_brain():
     x, y, voc = _dataset_and_voc()
     vect = tokenization.TextVectorizer.from_vocabulary(voc)
     reg = smoothed_regression.SmoothedRegression(n_components=10).fit(x, y)
-    encoder = text_to_brain.TextToBrain(vect, reg, mask_img=_mask_img(y.shape[1]))
-    res = encoder('feature0 and feature8 but not feature73')
-    simil = res['similar_words']
-    assert simil.loc['feature0']['similarity'] != 0
-    assert simil.loc['feature0']['weight_in_brain_map'] != 0
-    assert simil.loc['feature0']['weight_in_query'] != 0
-    assert simil.loc['feature8']['weight_in_query'] != 0
-    assert simil.loc['feature8']['similarity'] != 0
-    assert simil.loc['feature8']['weight_in_brain_map'] == pytest.approx(0)
-    assert simil.loc['feature18']['weight_in_brain_map'] == pytest.approx(0)
-    assert simil.loc['feature18']['weight_in_query'] == pytest.approx(0)
+    encoder = text_to_brain.TextToBrain(
+        vect, reg, mask_img=_mask_img(y.shape[1])
+    )
+    res = encoder("feature0 and feature8 but not feature73")
+    simil = res["similar_words"]
+    assert simil.loc["feature0"]["similarity"] != 0
+    assert simil.loc["feature0"]["weight_in_brain_map"] != 0
+    assert simil.loc["feature0"]["weight_in_query"] != 0
+    assert simil.loc["feature8"]["weight_in_query"] != 0
+    assert simil.loc["feature8"]["similarity"] != 0
+    assert simil.loc["feature8"]["weight_in_brain_map"] == pytest.approx(0)
+    assert simil.loc["feature18"]["weight_in_brain_map"] == pytest.approx(0)
+    assert simil.loc["feature18"]["weight_in_query"] == pytest.approx(0)

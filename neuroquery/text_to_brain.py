@@ -39,7 +39,8 @@ class TextToBrain(object):
 
     def _beta_norms(self):
         return np.linalg.norm(
-            self.smoothed_regression.regression_.coef_, axis=0)
+            self.smoothed_regression.regression_.coef_, axis=0
+        )
 
     def _get_masker(self):
         if not hasattr(self, "masker_"):
@@ -54,7 +55,7 @@ class TextToBrain(object):
     def transform(self, documents):
         raw_tfidf = self.vectorizer.transform(documents)
         raw_tfidf = normalize(raw_tfidf, copy=False)
-        self.smoothed_regression.regression_.intercept_ = 0.
+        self.smoothed_regression.regression_.intercept_ = 0.0
         z_scores = self.smoothed_regression.transform_to_z_maps(raw_tfidf)
         masker = self._get_masker()
         z_maps_unmasked = list(map(masker.inverse_transform, z_scores))

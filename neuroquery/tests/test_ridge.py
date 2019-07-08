@@ -1,3 +1,5 @@
+import tempfile
+
 import numpy as np
 from scipy import sparse
 
@@ -56,7 +58,7 @@ def test_ridge_dtype():
 )
 def test_z_maps(regressor):
     x, y = datasets.make_regression(
-        n_features=9,
+        n_features=39,
         n_targets=13,
         effective_rank=7,
         bias=10,
@@ -69,13 +71,25 @@ def test_z_maps(regressor):
     test_feat = [1, 3, 7]
     reg = regressor(store_M=True).fit(x, y)
     for feat in test_feat:
-        w = sparse.csr_matrix(([1], ([0], [feat])), shape=(1, 9))
+        w = sparse.csr_matrix(([1], ([0], [feat])), shape=(1, 39))
         z1 = reg.transform_to_z_maps(w)[0]
         z2 = reg.z_maps()[feat]
         assert np.allclose(z1, z2)
     if hasattr(reg, "selected_features_"):
         z = reg.z_maps(full=False)
         assert z.shape == (len(reg.selected_features_), 13)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        fitted = ridge.FittedLinearModel.from_model(reg)
+        fitted.to_data_dir(tmp_dir)
+        loaded = ridge.FittedLinearModel.from_data_dir(tmp_dir)
+        assert np.allclose(loaded.z_maps(), reg.z_maps())
+        assert np.allclose(
+            loaded.transform_to_z_maps(x), reg.transform_to_z_maps(x)
+        )
+        assert np.allclose(loaded.predict(x), reg.predict(x))
+        if hasattr(reg, "selected_features_"):
+            z = loaded.z_maps(full=False)
+            assert z.shape == (len(reg.selected_features_), 13)
 
 
 @pytest.mark.parametrize(
