@@ -1,8 +1,6 @@
 import numpy as np
 from scipy import sparse
 
-import pytest
-
 from neuroquery import nmf
 
 
@@ -26,3 +24,6 @@ def test_covariance_smoothing():
     s = op.transform(a)
     assert np.allclose(
         s, a.A.ravel() * .9 + .1 * op.normalized_V_.dot(op.V_.T)[0])
+    smoothed = nmf.CovarianceSmoothing(n_components=5, smoothing_weight=0.
+                                       ).fit_transform(X)
+    assert np.allclose(smoothed, X)

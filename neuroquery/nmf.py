@@ -2,12 +2,13 @@ import numpy as np
 from scipy import sparse
 
 from sklearn.decomposition import NMF
+from sklearn.base import BaseEstimator, TransformerMixin
 
 
 def _smoothing_matrix_sqrt(X, n_components=300):
     nmf = NMF(
         n_components=n_components, max_iter=200,
-        random_state=0, alpha=1e-1, l1_ratio=.1, verbose=1)
+        random_state=0, alpha=1e-1, l1_ratio=.1, verbose=0)
     u = nmf.fit_transform(X)
     v = nmf.components_.T
     z = np.linalg.norm(u, axis=0)
@@ -15,11 +16,11 @@ def _smoothing_matrix_sqrt(X, n_components=300):
     return v
 
 
-class CovarianceSmoothing(object):
+class CovarianceSmoothing(BaseEstimator, TransformerMixin):
 
-    def __init__(self, n_components=300, p=.1):
+    def __init__(self, n_components=300, smoothing_weight=.1):
         self.n_components = n_components
-        self.p = p
+        self.smoothing_weight = smoothing_weight
 
     def fit(self, X):
         self.V_ = _smoothing_matrix_sqrt(X, n_components=self.n_components)
@@ -33,5 +34,6 @@ class CovarianceSmoothing(object):
     def transform(self, X):
         if sparse.issparse(X):
             X = X.A
-        s = np.einsum('ij,jk,lk', X, self.normalized_V_, self.V_, optimize=True)
-        return self.p * s + (1 - self.p) * X
+        s = np.einsum(
+            'ij,jk,lk', X, self.normalized_V_, self.V_, optimize=True)
+        return self.smoothing_weight * s + (1 - self.smoothing_weight) * X
