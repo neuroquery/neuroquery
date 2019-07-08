@@ -7,9 +7,10 @@ from neuroquery._img_utils import get_masker
 
 
 class TextToBrain(object):
-    def __init__(self, vectorizer, smoothed_regression):
+    def __init__(self, vectorizer, smoothed_regression, mask_img=None):
         self.vectorizer = vectorizer
         self.smoothed_regression = smoothed_regression
+        self.mask_img = mask_img
 
     def full_vocabulary(self):
         return self.vectorizer.get_vocabulary()
@@ -37,19 +38,13 @@ class TextToBrain(object):
         return similar[similar > 0]
 
     def _beta_norms(self):
-        return np.linalg.norm(self.smoothed_regression.coef_, axis=0)
+        return np.linalg.norm(
+            self.smoothed_regression.regression_.coef_, axis=0)
 
     def _get_masker(self):
         if not hasattr(self, "masker_"):
-            self.masker_ = get_masker()
+            self.masker_ = get_masker(self.mask_img)
         return self.masker_
-
-    def _inverse_affine(self):
-        if not hasattr(self, "inverse_affine_"):
-            self.inverse_affine_ = np.linalg.inv(
-                self._get_masker().mask_img_.affine
-            )
-        return self.inverse_affine_
 
     def _supervised_vocabulary_set(self):
         if not hasattr(self, "supervised_vocabulary_set_"):
@@ -61,7 +56,7 @@ class TextToBrain(object):
         raw_tfidf = normalize(raw_tfidf, copy=False)
         z_scores = self.smoothed_regression.transform_to_z_maps(raw_tfidf)
         masker = self._get_masker()
-        z_maps_unmasked = list(map(masker.inverse_transform(z_scores)))
+        z_maps_unmasked = list(map(masker.inverse_transform, z_scores))
         smoothed_tfidf = self.smoothed_regression.smoothing_.transform(
             raw_tfidf
         )
@@ -81,7 +76,7 @@ class TextToBrain(object):
                 "similarity": self._similar_words(result["smoothed_tfidf"]),
                 "weight_in_query": self._similar_words(result["raw_tfidf"]),
                 "weight_in_brain_map": self._similar_words(
-                    result["smoothed_tfidf"][self._supervised_features]
+                    result["smoothed_tfidf"][self._supervised_features()]
                     * self._beta_norms(),
                     self.supervised_vocabulary(),
                 ),
