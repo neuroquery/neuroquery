@@ -1,3 +1,5 @@
+import tempfile
+
 import numpy as np
 from scipy import sparse
 
@@ -30,3 +32,7 @@ def test_covariance_smoothing():
         n_components=5, smoothing_weight=0.0
     ).fit_transform(X)
     assert np.allclose(smoothed, X)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        op.to_data_dir(tmp_dir)
+        loaded = nmf.CovarianceSmoothing.from_data_dir(tmp_dir)
+        assert np.allclose(loaded.transform(X), op.transform(X))
