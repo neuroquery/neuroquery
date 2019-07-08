@@ -353,3 +353,7 @@ def test_text_vectorizer():
     )
     transformed = vect(docs)
     assert np.allclose(transformed.A[2, :4], [0.5, 0.5, 0.0, 0.0])
+    vect = tokenization.TextVectorizer.from_vocabulary(
+        vect.get_vocabulary(), norm='l1')
+    transformed = vect(docs)
+    assert np.allclose(transformed.A[2, :4], [0.5, 0.5, 0.0, 0.0])

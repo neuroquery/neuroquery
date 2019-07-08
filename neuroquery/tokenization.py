@@ -483,6 +483,8 @@ def tokenizing_pipeline_from_vocabulary(
     as_tuples=False,
 ):
     vocabulary = string_sequence_to_tuples(vocabulary)
+    if frequencies is None:
+        frequencies = np.ones(len(vocabulary))
     tokenizer = Tokenizer(token_pattern)
     standardizer = Standardizer(stemming=stemming)
     stop_word_filter = StopWordFilter(stop_words, standardizer)
@@ -724,6 +726,33 @@ class TextVectorizer(object):
     ):
         tokenizer = tokenizing_pipeline_from_vocabulary_file(
             voc_file,
+            voc_mapping=voc_mapping,
+            stemming=stemming,
+            stop_words=stop_words,
+            out_of_voc=out_of_voc,
+            token_pattern=token_pattern,
+        )
+        return cls(
+            tokenizer, use_idf=use_idf, norm=norm, add_unigrams=add_unigrams
+        )
+
+    @classmethod
+    def from_vocabulary(
+        cls,
+        voc,
+        frequencies=None,
+        voc_mapping={},
+        stemming="identity",
+        stop_words="nltk",
+        out_of_voc="ignore",
+        token_pattern=WORD_PATTERN,
+        use_idf=True,
+        norm="l2",
+        add_unigrams=True,
+    ):
+        tokenizer = tokenizing_pipeline_from_vocabulary(
+            voc,
+            frequencies=frequencies,
             voc_mapping=voc_mapping,
             stemming=stemming,
             stop_words=stop_words,
