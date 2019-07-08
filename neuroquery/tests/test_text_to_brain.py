@@ -1,6 +1,9 @@
 import numpy as np
 from sklearn import datasets
 from nibabel.nifti1 import Nifti1Image
+
+import pytest
+
 from neuroquery import text_to_brain, smoothed_regression, tokenization
 
 
@@ -32,4 +35,13 @@ def test_text_to_brain():
     vect = tokenization.TextVectorizer.from_vocabulary(voc)
     reg = smoothed_regression.SmoothedRegression(n_components=10).fit(x, y)
     encoder = text_to_brain.TextToBrain(vect, reg, mask_img=_mask_img(y.shape[1]))
-    print(encoder('feature0 and feature8 but not feature73'))
+    res = encoder('feature0 and feature8 but not feature73')
+    simil = res['similar_words']
+    assert simil.loc['feature0']['similarity'] != 0
+    assert simil.loc['feature0']['weight_in_brain_map'] != 0
+    assert simil.loc['feature0']['weight_in_query'] != 0
+    assert simil.loc['feature8']['weight_in_query'] != 0
+    assert simil.loc['feature8']['similarity'] != 0
+    assert simil.loc['feature8']['weight_in_brain_map'] == pytest.approx(0)
+    assert simil.loc['feature18']['weight_in_brain_map'] == pytest.approx(0)
+    assert simil.loc['feature18']['weight_in_query'] == pytest.approx(0)
