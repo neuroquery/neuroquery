@@ -1,1 +1,9 @@
+nilearn
+sklearn
+pandas
+regex
+nltk != 3.2.1
+numpy
+scipy
+lxml
 matplotlib
