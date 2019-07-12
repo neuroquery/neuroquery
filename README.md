@@ -35,3 +35,6 @@ neuroquery_data = datasets.fetch_neuroquery_model()
 encoder = text_to_brain.TextToBrain.from_data_dir(neuroquery_data)
 encoder("prosopagnosia") # returns a dictionary containing a brain map and more
 ```
+
+`neuroquery` also provides classes to train new models from scientific
+publications' text and stereotactic peak activation coordinates.
