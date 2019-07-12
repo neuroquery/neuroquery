@@ -105,9 +105,12 @@ class TextToBrain(object):
                     * self._beta_norms(),
                     self.supervised_vocabulary(),
                 ),
-            }
+            },
+            columns=["similarity", "weight_in_brain_map", "weight_in_query"]
         )
         similar_words.fillna(0.0, inplace=True)
+        similar_words.sort_values(
+            by="weight_in_brain_map", ascending=False, inplace=True)
         result["similar_words"] = similar_words
         self._supervised_vocabulary_set()
         result[
