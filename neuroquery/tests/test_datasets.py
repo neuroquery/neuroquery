@@ -66,9 +66,9 @@ def test_fetch_neuroquery_model():
         assert getter.n_calls == 2
         assert "z_map" in res
 
-    getter = _FileGetter("mock-neuroquery_data-master.zip", 5)
+    getter = _FileGetter("mock-neuroquery_data-master.zip", 7)
     with mock.patch("requests.get", getter):
         with tempfile.TemporaryDirectory() as tmp_dir:
             with pytest.raises(RuntimeError):
                 data_dir = datasets.fetch_neuroquery_model(tmp_dir)
-        assert getter.n_calls == 3
+        assert getter.n_calls == 5

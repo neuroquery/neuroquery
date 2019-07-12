@@ -20,20 +20,26 @@ def get_neuroquery_data_dir(data_dir=None):
     return data_dir
 
 
-@try_n_times()
+@try_n_times(n_tries=5)
 def _download_file(url, out):
     with requests.get(url, stream=True) as resp:
         if resp.status_code != 200:
             raise RuntimeError(
                 "Model failed to be downloaded. Try again later?"
             )
-        length = int(resp.headers.get("content-length"))
+        length = resp.headers.get("content-length")
+        if length is not None:
+            length = int(length)
         downloaded = 0
         with open(out, "wb") as out_f:
             for chunk in resp.iter_content(chunk_size=4096):
                 downloaded += len(chunk)
+                if length is not None:
+                    progress = '{:.1%}'.format(downloaded / length)
+                else:
+                    progress = '{} / ?'.format(downloaded)
                 print(
-                    "downloading: {:.1%}".format(downloaded / length),
+                    "downloading: {}".format(progress),
                     end="\r",
                     flush=True,
                 )
