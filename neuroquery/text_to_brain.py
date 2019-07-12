@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.preprocessing import normalize
 from nilearn import image
 
-from neuroquery._img_utils import get_masker
+from neuroquery.img_utils import get_masker
 from neuroquery import tokenization, smoothed_regression
 
 
@@ -28,9 +28,10 @@ class TextToBrain(object):
         model_dir.mkdir(parents=True, exist_ok=True)
         self.vectorizer.to_vocabulary_file(str(model_dir / "vocabulary.csv"))
         self.smoothed_regression.to_data_dir(model_dir)
-        self.mask_img.to_filename(str(model_dir / "mask_img.nii.gz"))
+        self._get_masker().mask_img_.to_filename(
+            str(model_dir / "mask_img.nii.gz"))
 
-    def __init__(self, vectorizer, smoothed_regression, mask_img=None):
+    def __init__(self, vectorizer, smoothed_regression, mask_img):
         self.vectorizer = vectorizer
         self.smoothed_regression = smoothed_regression
         self.mask_img = mask_img
