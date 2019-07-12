@@ -6,6 +6,8 @@ import shutil
 
 import requests
 
+from neuroquery._utils import try_n_times
+
 
 def get_neuroquery_data_dir(data_dir=None):
     if data_dir is None:
@@ -17,8 +19,10 @@ def get_neuroquery_data_dir(data_dir=None):
     return data_dir
 
 
+@try_n_times()
 def _download_file(url, out):
     with requests.get(url, stream=True) as resp:
+        resp.raise_for_status()
         length = int(resp.headers.get('content-length'))
         downloaded = 0
         with open(out, 'wb') as out_f:

@@ -18,5 +18,6 @@ setup(
         "numpy",
         "scipy",
         "lxml",
+        "requests",
     ],
 )

@@ -6,4 +6,5 @@ nltk != 3.2.1
 numpy
 scipy
 lxml
+requests
 matplotlib
