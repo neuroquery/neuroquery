@@ -60,8 +60,20 @@ plotting.plot_stat_map(
 ######################################################################
 #
 
-# in a Jupyter notebook, display the map on the cortical surface:
-plotting.view_img_on_surf(response["z_map"], threshold=3.)
+# Display the map on the cortical surface:
+# (in a Jupyter notebook,
+# `.open_in_browser()` can be ommitted to open an inline view)
+plotting.view_img_on_surf(response["z_map"], threshold=3.).open_in_browser()
+
+
+######################################################################
+#
+
+# Or open interactive viewer:
+# (in a Jupyter notebook,
+# `.open_in_browser()` can be ommitted to open an inline view)
+plotting.view_img(response["z_map"], threshold=3.).open_in_browser()
+
 
 ######################################################################
 # "similar_words" is a DataFrame containing terms that are related to the
