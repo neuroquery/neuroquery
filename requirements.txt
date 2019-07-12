@@ -1,0 +1,8 @@
+nilearn
+scikit-learn
+pandas
+regex
+nltk
+numpy
+scipy
+lxml
