@@ -33,7 +33,7 @@ started right away:
 from neuroquery import datasets, text_to_brain
 neuroquery_data = datasets.fetch_neuroquery_model()
 encoder = text_to_brain.TextToBrain.from_data_dir(neuroquery_data)
-encoder("prosopagnosia") # returns a dictionary containing a brain map and more
+encoder("Parkinson's disease") # returns a dictionary containing a brain map and more
 ```
 
 `neuroquery` also provides classes to train new models from scientific
