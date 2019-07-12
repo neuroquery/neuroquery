@@ -3,7 +3,6 @@ from functools import wraps
 
 
 class Sleep(object):
-
     def __init__(self, delay=2):
         self.delay_ = delay
 
@@ -26,13 +25,13 @@ class try_n_times(object):
         def decorate(*args, **kwargs):
             error = None
             tries = 0
-            while (True):
+            while True:
                 try:
                     return fun(*args, **kwargs)
                 except Exception as e:
                     tries += 1
                     error = e
-                    if (tries == self.n_tries_):
+                    if tries == self.n_tries_:
                         break
                 self.action_(*args, **dict(kwargs, error=error))
             self.on_fail_(error)

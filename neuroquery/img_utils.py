@@ -28,12 +28,12 @@ def coords_to_peaks_img(coords, mask_img):
     mask_img = image.load_img(mask_img)
     voxels = coords_to_voxels(coords, mask_img)
     peaks = np.zeros(mask_img.shape)
-    np.add.at(peaks, tuple(voxels.T), 1.)
+    np.add.at(peaks, tuple(voxels.T), 1.0)
     peaks_img = image.new_img_like(mask_img, peaks)
     return peaks_img
 
 
-def gaussian_coord_smoothing(coords, mask_img=None, fwhm=8.):
+def gaussian_coord_smoothing(coords, mask_img=None, fwhm=8.0):
     masker = get_masker(mask_img)
     peaks_img = coords_to_peaks_img(coords, mask_img=masker.mask_img_)
     img = image.smooth_img(peaks_img, fwhm=fwhm)

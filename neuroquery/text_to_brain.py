@@ -29,7 +29,8 @@ class TextToBrain(object):
         self.vectorizer.to_vocabulary_file(str(model_dir / "vocabulary.csv"))
         self.smoothed_regression.to_data_dir(model_dir)
         self._get_masker().mask_img_.to_filename(
-            str(model_dir / "mask_img.nii.gz"))
+            str(model_dir / "mask_img.nii.gz")
+        )
 
     def __init__(self, vectorizer, smoothed_regression, mask_img):
         self.vectorizer = vectorizer
@@ -107,11 +108,12 @@ class TextToBrain(object):
                     self.supervised_vocabulary(),
                 ),
             },
-            columns=["similarity", "weight_in_brain_map", "weight_in_query"]
+            columns=["similarity", "weight_in_brain_map", "weight_in_query"],
         )
         similar_words.fillna(0.0, inplace=True)
         similar_words.sort_values(
-            by="weight_in_brain_map", ascending=False, inplace=True)
+            by="weight_in_brain_map", ascending=False, inplace=True
+        )
         result["similar_words"] = similar_words
         self._supervised_vocabulary_set()
         result[

@@ -54,14 +54,15 @@ from nilearn import plotting
 
 print(type(response["z_map"]))
 plotting.plot_stat_map(
-    response["z_map"], display_mode="z", title="aphasia", threshold=3.)
+    response["z_map"], display_mode="z", title="aphasia", threshold=3.0
+)
 
 
 ######################################################################
 #
 
 # Display the map on the cortical surface:
-view = plotting.view_img_on_surf(response["z_map"], threshold=3.)
+view = plotting.view_img_on_surf(response["z_map"], threshold=3.0)
 view.open_in_browser()
 # (in a Jupyter notebook, we can display an inline view):
 view
@@ -70,7 +71,7 @@ view
 #
 
 # Or open interactive viewer:
-view = plotting.view_img(response["z_map"], threshold=3.)
+view = plotting.view_img(response["z_map"], threshold=3.0)
 view.open_in_browser()
 # (in a Jupyter notebook, we can display an inline view):
 view
@@ -82,8 +83,11 @@ view
 # query, according to co-occurrence statistics in the literature.
 
 print("Most similar terms:\n")
-print(response["similar_words"].sort_values(
-    by="similarity", ascending=False).head())
+print(
+    response["similar_words"]
+    .sort_values(by="similarity", ascending=False)
+    .head()
+)
 
 ######################################################################
 # "weight_in_brain_map" is the importance of the term in the brain map. It
@@ -93,8 +97,11 @@ print(response["similar_words"].sort_values(
 # weight.
 
 print("\nMost important terms for brain map prediction:\n")
-print(response["similar_words"].sort_values(
-    by="weight_in_brain_map", ascending=False).head())
+print(
+    response["similar_words"]
+    .sort_values(by="weight_in_brain_map", ascending=False)
+    .head()
+)
 
 ######################################################################
 # "weight_in_query" is the importance of the term in the query itself. It
@@ -103,8 +110,12 @@ print(response["similar_words"].sort_values(
 # that do not appear in the query get a "weight_in_query" of 0.
 
 print("\nTerms recognized in the query:\n")
-print(response["similar_words"].query("weight_in_query != 0").sort_values(
-    by="weight_in_query", ascending=False).head())
+print(
+    response["similar_words"]
+    .query("weight_in_query != 0")
+    .sort_values(by="weight_in_query", ascending=False)
+    .head()
+)
 
 
 ######################################################################
