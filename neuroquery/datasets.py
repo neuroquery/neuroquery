@@ -22,7 +22,9 @@ def get_neuroquery_data_dir(data_dir=None):
 @try_n_times()
 def _download_file(url, out):
     with requests.get(url, stream=True) as resp:
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            raise RuntimeError(
+                "Model failed to be downloaded. Try again later?")
         length = int(resp.headers.get('content-length'))
         downloaded = 0
         with open(out, 'wb') as out_f:

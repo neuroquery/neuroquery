@@ -2,8 +2,6 @@ import tempfile
 import pathlib
 from unittest import mock
 
-import requests
-
 import pytest
 
 from neuroquery import text_to_brain
@@ -16,9 +14,7 @@ class _FileResponse(object):
         self.data_file = str(
             pathlib.Path(__file__).parent / 'data' / data_file)
         self.headers = {'content-length': 1000}
-
-    def raise_for_status(self):
-        pass
+        self.status_code = 200
 
     def iter_content(self, *args, **kwargs):
         with open(self.data_file, 'rb') as f:
@@ -35,17 +31,10 @@ class _FileResponse(object):
         pass
 
 
-class HTTPError(Exception):
-    pass
-
-
 class _BadResponse(object):
 
     def __init__(self, *args):
-        pass
-
-    def raise_for_status(self):
-        raise HTTPError()
+        self.status_code = 400
 
     def __enter__(self):
         return self
@@ -81,6 +70,6 @@ def test_fetch_neuroquery_model():
     getter = _FileGetter("mock-neuroquery_data-master.zip", 5)
     with mock.patch('requests.get', getter):
         with tempfile.TemporaryDirectory() as tmp_dir:
-            with pytest.raises(HTTPError):
+            with pytest.raises(RuntimeError):
                 data_dir = datasets.fetch_neuroquery_model(tmp_dir)
         assert getter.n_calls == 3
