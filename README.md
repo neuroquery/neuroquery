@@ -13,15 +13,25 @@ structures according to the current scientific literature.
 It can be used through a web interface: https://neuroquery.saclay.inria.fr
 
 This Python package permits using NeuroQuery offline or integrating it in other
-applications. In the `examples` folder, `plot_using_trained_model.py` shows basic
-usage of NeuroQuery.
+applications. 
 
-NeuroQuery has a function to download a model so that users can get started
-right away:
+## Installation and usage
+
+`neuroquery` can be installed with
+
+```
+pip install git+https://github.com/neuroquery/neuroquery.git
+```
+
+In the `examples` folder, `plot_using_trained_model.py` shows basic
+usage of `neuroquery`.
+
+`neuroquery` has a function to download a trained model so that users can get
+started right away:
 
 ```python
 from neuroquery import datasets, text_to_brain
 neuroquery_data = datasets.fetch_neuroquery_model()
 encoder = text_to_brain.TextToBrain.from_data_dir(neuroquery_data)
-encoder("prosopagnosia") # returns a dict containing a brain map and more
+encoder("prosopagnosia") # returns a dictionary containing a brain map and more
 ```
