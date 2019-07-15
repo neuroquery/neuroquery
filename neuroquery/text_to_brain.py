@@ -11,8 +11,42 @@ from neuroquery import tokenization, smoothed_regression
 
 
 class TextToBrain(object):
+    """Text -> brain map encoder.
+
+    It encodes text into statistical maps of the brain and also provides a list
+    of related terms.
+
+    It can be initialized with a fitted regression model
+    (`neuroquery.smoothed_regression.SmoothedRegression`) or loaded using
+    `from_data_dir`. Most users will probably load a pre-trained model with
+    `from_data_dir`.
+
+    Parameters
+    ----------
+    vectorizer : `neuroquery.tokenization.TextVectorizer`
+        An object that transforms text into TFIDF features.
+
+    smoothed_regression : `neuroquery.smoothed_regression.SmoothedRegression`
+        A reduced-rank regression that combines feature smoothing, projection,
+        and linear regression. The input features must correspond to the
+        outputs of `vectorizer`.
+
+    mask_img : Nifti1Image
+        Mask of the regression targets. The non-zero voxels correspond to the
+        dependent variables.
+
+    """
     @classmethod
     def from_data_dir(cls, model_dir):
+        """Load a pre-trained TextToBrain model.
+
+        Parameters
+        ----------
+        model_dir : str
+            path to a directory containing the serialized trained model.
+            The directory must be organized as the one returned by
+            `neuroquery.datasets.fetch_neuroquery_model`.
+        """
         model_dir = pathlib.Path(model_dir)
         vectorizer = tokenization.TextVectorizer.from_vocabulary_file(
             str(model_dir / "vocabulary.csv"), voc_mapping="auto"
@@ -24,6 +58,7 @@ class TextToBrain(object):
         return cls(vectorizer, regression, mask_img)
 
     def to_data_dir(self, model_dir):
+        """Save the model so it can later be loaded with `from_data_dir`."""
         model_dir = pathlib.Path(model_dir)
         model_dir.mkdir(parents=True, exist_ok=True)
         self.vectorizer.to_vocabulary_file(str(model_dir / "vocabulary.csv"))
@@ -38,6 +73,7 @@ class TextToBrain(object):
         self.mask_img = mask_img
 
     def full_vocabulary(self):
+        """All the terms recognized by the model."""
         return self.vectorizer.get_vocabulary()
 
     def _supervised_features(self):
@@ -50,6 +86,7 @@ class TextToBrain(object):
         return self.smoothed_regression.regression_.selected_features_
 
     def supervised_vocabulary(self):
+        """Terms selected as features for the supervised regression."""
         return np.asarray(self.full_vocabulary())[self._supervised_features()]
 
     def _similar_words(self, tfidf, vocabulary=None):
@@ -78,6 +115,21 @@ class TextToBrain(object):
         return self.supervised_vocabulary_set_
 
     def transform(self, documents):
+        """Transform a set of documents
+
+        Parameters
+        ----------
+        documents : list or array of str
+            the text snippets to transform
+
+        Returns
+        -------
+        list of dict, each containing:
+            - "z_map": a nifti image of the most relevant brain regions.
+            - "raw_tfidf": the vectorized documents.
+            - "smoothed_tfidf": the tfidf after semantic smoothing.
+
+        """
         raw_tfidf = self.vectorizer.transform(documents)
         raw_tfidf = normalize(raw_tfidf, copy=False)
         self.smoothed_regression.regression_.intercept_ = 0.0
@@ -95,6 +147,27 @@ class TextToBrain(object):
         }
 
     def __call__(self, document):
+        """Transform a document
+
+        Parameters
+        ----------
+        document : str
+            the text to transform
+
+        Returns
+        -------
+        dict containing:
+            - "z_map": a nifti image of the most relevant brain regions.
+            - "raw_tfidf": the vectorized documents.
+            - "similar_words": pandas DataFrame containing related terms.
+                - "similarity" is how much the term is related.
+                - "weight_in_brain_map" is the contribution of the term in the
+                  predicted "z_map".
+                - "weight_in_query" is the TFIDF of the term in `document`.
+            - "highlighted_text": an XML document showing which terms were
+              recognized in the provided text.
+            - "smoothed_tfidf": the tfidf after semantic smoothing.
+        """
         self.vectorizer.tokenizer.keep_pos = True
         result = self.transform([document])
         result = {k: v[0] for k, v in result.items()}
