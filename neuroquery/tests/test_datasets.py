@@ -2,10 +2,6 @@ import tempfile
 import pathlib
 from unittest import mock
 
-import requests
-
-import pytest
-
 from neuroquery import text_to_brain
 from neuroquery import datasets
 
