@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/neuroquery/neuroquery.svg?branch=master)](https://travis-ci.com/neuroquery/neuroquery) [![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/master/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery)
+[![Build Status](https://travis-ci.com/neuroquery/neuroquery.svg?branch=master)](https://travis-ci.com/neuroquery/neuroquery) [![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/master/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery) [![Build status](https://ci.appveyor.com/api/projects/status/dk6yr0wl126hvty9?svg=true)](https://ci.appveyor.com/project/jeromedockes/neuroquery)
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/neuroquery/neuroquery.git/master?filepath=examples%2Fplot_using_trained_model.ipynb)
 
@@ -15,13 +15,22 @@ It can be used through a web interface: https://neuroquery.saclay.inria.fr
 This Python package permits using NeuroQuery offline or integrating it in other
 applications. 
 
-## Installation and usage
+## Getting started
+
+### Dependencies
+
+NeuroQuery requires Python 3, numpy, scipy, scikit-learn, nilearn, pandas,
+regex, nltk, lxml, and requests.
+
+### Installation
 
 `neuroquery` can be installed with
 
 ```
-pip install git+https://github.com/neuroquery/neuroquery.git
+pip install -U git+https://github.com/neuroquery/neuroquery.git
 ```
+
+### Usage
 
 In the `examples` folder, `plot_using_trained_model.py` shows basic
 usage of `neuroquery`.
