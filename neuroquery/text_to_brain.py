@@ -158,7 +158,6 @@ class TextToBrain(object):
         -------
         dict containing:
             - "z_map": a nifti image of the most relevant brain regions.
-            - "raw_tfidf": the vectorized documents.
             - "similar_words": pandas DataFrame containing related terms.
                 - "similarity" is how much the term is related.
                 - "weight_in_brain_map" is the contribution of the term in the
@@ -167,6 +166,7 @@ class TextToBrain(object):
             - "highlighted_text": an XML document showing which terms were
               recognized in the provided text.
             - "smoothed_tfidf": the tfidf after semantic smoothing.
+            - "raw_tfidf": the vectorized documents.
         """
         self.vectorizer.tokenizer.keep_pos = True
         result = self.transform([document])
