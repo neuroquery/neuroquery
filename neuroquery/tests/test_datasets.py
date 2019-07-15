@@ -16,7 +16,7 @@ class _FileResponse(object):
             pathlib.Path(__file__).parent / "data" / data_file
         )
         self.status_code = 200
-        with open(self.data_file, 'rb') as f:
+        with open(self.data_file, "rb") as f:
             self.content = f.read()
 
     def raise_for_status(self):
@@ -24,7 +24,7 @@ class _FileResponse(object):
 
 
 def test_fetch_neuroquery_model():
-    resp = _FileResponse('mock-neuroquery_model.zip')
+    resp = _FileResponse("mock-neuroquery_model.zip")
     with mock.patch("requests.get", return_value=resp) as mock_get:
         with tempfile.TemporaryDirectory() as tmp_dir:
             data_dir = datasets.fetch_neuroquery_model(tmp_dir)
@@ -37,11 +37,11 @@ def test_fetch_neuroquery_model():
 
 def test_get_neuroquery_data_dir():
     with tempfile.TemporaryDirectory() as tmp_dir:
-        target_dir = str(pathlib.Path(tmp_dir) / 'neuroquery_data_1')
+        target_dir = str(pathlib.Path(tmp_dir) / "neuroquery_data_1")
         nq_dir = datasets.get_neuroquery_data_dir(target_dir)
         assert nq_dir == target_dir
         assert pathlib.Path(nq_dir).is_dir()
         with mock.patch("os.environ.get", return_value=tmp_dir):
             nq_dir = datasets.get_neuroquery_data_dir()
-            assert nq_dir == str(pathlib.Path(tmp_dir) / 'neuroquery_data')
+            assert nq_dir == str(pathlib.Path(tmp_dir) / "neuroquery_data")
             assert pathlib.Path(nq_dir).is_dir()
