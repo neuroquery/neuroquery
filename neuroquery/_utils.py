@@ -1,3 +1,5 @@
+import os
+import stat
 import time
 from functools import wraps
 
@@ -37,3 +39,11 @@ class try_n_times(object):
             self.on_fail_(error)
 
         return decorate
+
+
+def _chmod(top, mode=stat.S_IWUSR|stat.S_IRUSR):
+    for root, dirs, files in os.walk(top):
+        for d in dirs:
+            os.chmod(os.path.join(root, d), mode|stat.S_IXUSR)
+        for f in files:
+            os.chmod(os.path.join(root, f), mode)

@@ -6,7 +6,7 @@ import shutil
 
 import requests
 
-from neuroquery._utils import try_n_times
+from neuroquery._utils import try_n_times, _chmod
 
 
 def get_neuroquery_data_dir(data_dir=None):
@@ -60,6 +60,7 @@ def _download_neuroquery_data(out_dir):
         zf.extractall(str(repo))
         data = repo / "neuroquery_data-master"
         shutil.copytree(str(data), out_dir)
+        _chmod(tmp_dir)
     return out_dir
 
 
