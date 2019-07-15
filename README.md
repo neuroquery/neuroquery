@@ -38,7 +38,7 @@ encoder = text_to_brain.TextToBrain.from_data_dir(
 # encoder returns a dictionary containing a brain map and more,
 # see examples or documentation for details
 view_img(
-    encoder("Parkinson's disease")["z_map"], threshold=3.0).open_in_browser()
+    encoder("Parkinson's disease")["z_map"], threshold=3.).open_in_browser()
 ```
 
 `neuroquery` also provides classes to train new models from scientific
