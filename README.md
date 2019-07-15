@@ -31,9 +31,14 @@ started right away:
 
 ```python
 from neuroquery import datasets, text_to_brain
-neuroquery_data = datasets.fetch_neuroquery_model()
-encoder = text_to_brain.TextToBrain.from_data_dir(neuroquery_data)
-encoder("Parkinson's disease") # returns a dictionary containing a brain map and more
+from nilearn.plotting import view_img
+
+encoder = text_to_brain.TextToBrain.from_data_dir(
+    datasets.fetch_neuroquery_model())
+# encoder returns a dictionary containing a brain map and more,
+# see examples or documentation for details
+view_img(
+    encoder("Parkinson's disease")["z_map"], threshold=3.0).open_in_browser()
 ```
 
 `neuroquery` also provides classes to train new models from scientific
