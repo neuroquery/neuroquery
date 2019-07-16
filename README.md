@@ -17,6 +17,8 @@ applications.
 
 ## Getting started
 
+[Quick demo](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/master/examples/minimal_example.ipynb)
+
 ### Dependencies
 
 NeuroQuery requires Python 3, numpy, scipy, scikit-learn, nilearn, pandas,
