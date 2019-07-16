@@ -36,6 +36,7 @@ class TextToBrain(object):
         dependent variables.
 
     """
+
     @classmethod
     def from_data_dir(cls, model_dir):
         """Load a pre-trained TextToBrain model.

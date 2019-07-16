@@ -8,6 +8,11 @@ meta-analysis of the neuroimaging literature.
 """
 
 __all__ = [
-    "datasets", "img_utils", "nmf", "ridge", "smoothed_regression",
-    "text_to_brain", "tokenization"
+    "datasets",
+    "img_utils",
+    "nmf",
+    "ridge",
+    "smoothed_regression",
+    "text_to_brain",
+    "tokenization",
 ]

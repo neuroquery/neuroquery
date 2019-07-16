@@ -12,12 +12,13 @@ from neuroquery import datasets, text_to_brain
 from nilearn.plotting import view_img
 
 encoder = text_to_brain.TextToBrain.from_data_dir(
-    datasets.fetch_neuroquery_model())
+    datasets.fetch_neuroquery_model()
+)
 
 ######################################################################
 query = """Parkinson's disease"""
 
-view_img(encoder(query)["z_map"], threshold=3.)
+view_img(encoder(query)["z_map"], threshold=3.1)
 
 ######################################################################
 # Note: if you are not using a jupyter notebook, use `.open_in_browser()` to

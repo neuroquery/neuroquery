@@ -54,7 +54,7 @@ from nilearn import plotting
 
 print(type(response["z_map"]))
 plotting.plot_stat_map(
-    response["z_map"], display_mode="z", title="aphasia", threshold=3.0
+    response["z_map"], display_mode="z", title="aphasia", threshold=3.1
 )
 
 
@@ -62,7 +62,7 @@ plotting.plot_stat_map(
 #
 
 # Display the map on the cortical surface:
-view = plotting.view_img_on_surf(response["z_map"], threshold=3.0)
+view = plotting.view_img_on_surf(response["z_map"], threshold=3.1)
 view.open_in_browser()
 # (in a Jupyter notebook, we can display an inline view):
 view
@@ -71,7 +71,7 @@ view
 #
 
 # Or open interactive viewer:
-view = plotting.view_img(response["z_map"], threshold=3.0)
+view = plotting.view_img(response["z_map"], threshold=3.1)
 view.open_in_browser()
 # (in a Jupyter notebook, we can display an inline view):
 view
