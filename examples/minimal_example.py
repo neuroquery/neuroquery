@@ -16,10 +16,18 @@ encoder = text_to_brain.TextToBrain.from_data_dir(
 )
 
 ######################################################################
-query = """Parkinson's disease"""
-
-view_img(encoder(query)["z_map"], threshold=3.1)
+query = """Huntington's disease"""
+result = encoder(query)
+view_img(result["z_map"], threshold=3.1)
 
 ######################################################################
 # Note: if you are not using a jupyter notebook, use `.open_in_browser()` to
-# open the plot above.
+# open the plot above:
+
+view_img(result["z_map"], threshold=3.1).open_in_browser()
+
+
+######################################################################
+# Display some relevant terms:
+
+print(result["similar_words"].head(15))
