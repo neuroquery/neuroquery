@@ -21,6 +21,8 @@ result = encoder(query)
 view_img(result["z_map"], threshold=3.1)
 
 ######################################################################
+# (drag the mouse on this interactive plot to see other slices)
+#
 # Note: if you are not using a jupyter notebook, use `.open_in_browser()` to
 # open the plot above:
 
