@@ -305,7 +305,7 @@ class TokenizingPipeline(object):
         else:
             freq = np.ones(len(self.raw_vocabulary))
         pd.Series(freq, index=self.raw_vocabulary).to_csv(
-            voc_file, header=None
+            voc_file, header=False
         )
         _save_voc_mapping(
             voc_file,

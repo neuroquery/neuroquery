@@ -2,7 +2,7 @@ import tempfile
 import pathlib
 from unittest import mock
 
-from neuroquery import text_to_brain
+from neuroquery import encoding
 from neuroquery import datasets
 
 
@@ -24,7 +24,7 @@ def test_fetch_neuroquery_model():
     with mock.patch("requests.get", return_value=resp) as mock_get:
         with tempfile.TemporaryDirectory() as tmp_dir:
             data_dir = datasets.fetch_neuroquery_model(tmp_dir)
-            model = text_to_brain.TextToBrain.from_data_dir(data_dir)
+            model = encoding.NeuroQueryModel.from_data_dir(data_dir)
             res = model("reading words")
             assert "z_map" in res
             data_dir = datasets.fetch_neuroquery_model(tmp_dir)

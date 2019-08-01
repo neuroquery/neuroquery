@@ -19,9 +19,9 @@ reproduce the website's functionality in a Python script.
 # Download the vocabulary and learned coefficients of a NeuroQuery model
 # ----------------------------------------------------------------------
 
-from neuroquery import datasets
+from neuroquery import fetch_neuroquery_model
 
-neuroquery_data = datasets.fetch_neuroquery_model()
+neuroquery_data = fetch_neuroquery_model()
 print(neuroquery_data)
 
 
@@ -29,9 +29,9 @@ print(neuroquery_data)
 # Load the NeuroQuery model
 # -------------------------
 
-from neuroquery import text_to_brain
+from neuroquery import NeuroQueryModel
 
-encoder = text_to_brain.TextToBrain.from_data_dir(neuroquery_data)
+encoder = NeuroQueryModel.from_data_dir(neuroquery_data)
 
 
 ######################################################################

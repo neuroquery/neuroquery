@@ -8,12 +8,10 @@ The model used here is the same as the one deployed on the neuroquery website
 ######################################################################
 # Encode a query into a statistical map of the brain
 # --------------------------------------------------
-from neuroquery import datasets, text_to_brain
+from neuroquery import fetch_neuroquery_model, NeuroQueryModel
 from nilearn.plotting import view_img
 
-encoder = text_to_brain.TextToBrain.from_data_dir(
-    datasets.fetch_neuroquery_model()
-)
+encoder = NeuroQueryModel.from_data_dir(fetch_neuroquery_model())
 
 ######################################################################
 query = """Huntington's disease"""

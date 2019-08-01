@@ -41,11 +41,10 @@ usage of `neuroquery`.
 started right away:
 
 ```python
-from neuroquery import datasets, text_to_brain
+from neuroquery import fetch_neuroquery_model, NeuroQueryModel
 from nilearn.plotting import view_img
 
-encoder = text_to_brain.TextToBrain.from_data_dir(
-    datasets.fetch_neuroquery_model())
+encoder = NeuroQueryModel.from_data_dir(fetch_neuroquery_model())
 # encoder returns a dictionary containing a brain map and more,
 # see examples or documentation for details
 view_img(

@@ -10,7 +10,7 @@ from neuroquery.img_utils import get_masker
 from neuroquery import tokenization, smoothed_regression
 
 
-class TextToBrain(object):
+class NeuroQueryModel(object):
     """Text -> brain map encoder.
 
     It encodes text into statistical maps of the brain and also provides a list

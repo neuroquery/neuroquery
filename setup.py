@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(
     name="neuroquery",
-    packages=["neuroquery"],
-    package_data={"neuroquery": ["data/*"]},
+    packages=find_packages(),
+    package_data={"neuroquery": ["data/*"],
+                  "neuroquery.tests": ["data/*"]},
     install_requires=[
         "nilearn",
         "sklearn",

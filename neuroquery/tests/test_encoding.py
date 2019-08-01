@@ -6,7 +6,7 @@ from nibabel.nifti1 import Nifti1Image
 
 import pytest
 
-from neuroquery import text_to_brain, smoothed_regression, tokenization
+from neuroquery import encoding, smoothed_regression, tokenization
 
 
 def _dataset_and_voc():
@@ -32,11 +32,11 @@ def _mask_img(n):
     return Nifti1Image(img, affine=affine)
 
 
-def test_text_to_brain():
+def test_neuroquery_model():
     x, y, voc = _dataset_and_voc()
     vect = tokenization.TextVectorizer.from_vocabulary(voc)
     reg = smoothed_regression.SmoothedRegression(n_components=10).fit(x, y)
-    encoder = text_to_brain.TextToBrain(
+    encoder = encoding.NeuroQueryModel(
         vect, reg, mask_img=_mask_img(y.shape[1])
     )
     text = "feature0 and feature8 but not feature73"
@@ -52,6 +52,6 @@ def test_text_to_brain():
     assert simil.loc["feature18"]["weight_in_query"] == pytest.approx(0)
     with tempfile.TemporaryDirectory() as tmp_dir:
         encoder.to_data_dir(tmp_dir)
-        loaded = text_to_brain.TextToBrain.from_data_dir(tmp_dir)
+        loaded = encoding.NeuroQueryModel.from_data_dir(tmp_dir)
         encoded = loaded(text)["z_map"].get_data()
         assert np.allclose(encoded, res["z_map"].get_data())
