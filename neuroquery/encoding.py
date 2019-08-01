@@ -4,10 +4,13 @@ import numpy as np
 from scipy import sparse
 import pandas as pd
 from sklearn.preprocessing import normalize
+from sklearn.utils.extmath import safe_sparse_dot
 from nilearn import image
 
 from neuroquery.img_utils import get_masker
 from neuroquery import tokenization, smoothed_regression
+
+_MAX_SIMILAR_DOCS_RETURNED = 100
 
 
 class NeuroQueryModel(object):
@@ -56,7 +59,16 @@ class NeuroQueryModel(object):
             str(model_dir)
         )
         mask_img = image.load_img(str(model_dir / "mask_img.nii.gz"))
-        return cls(vectorizer, regression, mask_img)
+        corpus_tfidf = model_dir / "corpus_tfidf.npz"
+        corpus_metadata = model_dir / "corpus_metadata.csv"
+        if corpus_tfidf.is_file() and corpus_metadata.is_file():
+            corpus_info = {}
+            corpus_info["tfidf"] = sparse.load_npz(str(corpus_tfidf))
+            corpus_info["metadata"] = pd.read_csv(
+                str(corpus_metadata), encoding="utf-8")
+        else:
+            corpus_info = None
+        return cls(vectorizer, regression, mask_img, corpus_info=corpus_info)
 
     def to_data_dir(self, model_dir):
         """Save the model so it can later be loaded with `from_data_dir`."""
@@ -67,11 +79,18 @@ class NeuroQueryModel(object):
         self._get_masker().mask_img_.to_filename(
             str(model_dir / "mask_img.nii.gz")
         )
+        if self.corpus_info is not None:
+            sparse.save_npz(
+                str(model_dir / "corpus_tfidf.npz"), self.corpus_info["tfidf"])
+            self.corpus_info["metadata"].to_csv(
+                str(model_dir / "corpus_metadata.csv"), index=False)
 
-    def __init__(self, vectorizer, smoothed_regression, mask_img):
+    def __init__(self, vectorizer, smoothed_regression, mask_img,
+                 corpus_info=None):
         self.vectorizer = vectorizer
         self.smoothed_regression = smoothed_regression
         self.mask_img = mask_img
+        self.corpus_info = corpus_info
 
     def full_vocabulary(self):
         """All the terms recognized by the model."""
@@ -99,6 +118,19 @@ class NeuroQueryModel(object):
             ascending=False
         )
         return similar[similar > 0]
+
+    def similar_documents(self, tfidf):
+        if self.corpus_info is None:
+            return None
+        similarities = safe_sparse_dot(
+            tfidf, self.corpus_info["tfidf"].T, dense_output=True).ravel()
+        order = np.argsort(similarities)[::-1]
+        order = order[similarities[order] > 0][:_MAX_SIMILAR_DOCS_RETURNED]
+        ordered_simil = similarities[order]
+        similar_docs = self.corpus_info["metadata"].iloc[order].reset_index(
+            drop=True)
+        similar_docs['similarity'] = ordered_simil
+        return similar_docs
 
     def _beta_norms(self):
         return np.linalg.norm(
@@ -189,6 +221,8 @@ class NeuroQueryModel(object):
             by="weight_in_brain_map", ascending=False, inplace=True
         )
         result["similar_words"] = similar_words
+        result["similar_documents"] = self.similar_documents(
+            result["smoothed_tfidf"])
         self._supervised_vocabulary_set()
         result[
             "highlighted_text"
