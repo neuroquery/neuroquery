@@ -1,6 +1,7 @@
 import tempfile
 
 import numpy as np
+import pandas as pd
 from sklearn import datasets
 from nibabel.nifti1 import Nifti1Image
 
@@ -39,7 +40,7 @@ def test_neuroquery_model():
     encoder = encoding.NeuroQueryModel(
         vect, reg, mask_img=_mask_img(y.shape[1])
     )
-    text = "feature0 and feature8 but not feature73"
+    text = "feature0 and feature8 compared to feature73"
     res = encoder(text)
     simil = res["similar_words"]
     assert simil.loc["feature0"]["similarity"] != 0
@@ -50,8 +51,31 @@ def test_neuroquery_model():
     assert simil.loc["feature8"]["weight_in_brain_map"] == pytest.approx(0)
     assert simil.loc["feature18"]["weight_in_brain_map"] == pytest.approx(0)
     assert simil.loc["feature18"]["weight_in_query"] == pytest.approx(0)
+    assert res["similar_documents"] is None
     with tempfile.TemporaryDirectory() as tmp_dir:
         encoder.to_data_dir(tmp_dir)
         loaded = encoding.NeuroQueryModel.from_data_dir(tmp_dir)
-        encoded = loaded(text)["z_map"].get_data()
-        assert np.allclose(encoded, res["z_map"].get_data())
+        assert not loaded.vectorizer.add_unigrams
+    encoded = loaded(text)["z_map"].get_data()
+    assert np.allclose(encoded, res["z_map"].get_data())
+
+    n_docs = 4
+    tfidf = np.zeros((n_docs, x.shape[1]))
+    tfidf[:n_docs, :n_docs] = np.eye(n_docs)
+    metadata = pd.DataFrame.from_dict({"id": np.arange(n_docs)})
+    encoder = encoding.NeuroQueryModel(
+        vect, reg, mask_img=_mask_img(y.shape[1]),
+        corpus_info={"tfidf": tfidf, "metadata": metadata}
+    )
+    for i in range(n_docs):
+        res = encoder(encoder.full_vocabulary()[i])
+        assert res["similar_documents"].id[0] == i
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        encoder.to_data_dir(tmp_dir)
+        loaded = encoding.NeuroQueryModel.from_data_dir(tmp_dir)
+        assert not loaded.vectorizer.add_unigrams
+
+    for i in range(n_docs):
+        res = encoder(encoder.full_vocabulary()[i])
+        assert res["similar_documents"].id[0] == i

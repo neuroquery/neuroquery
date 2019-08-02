@@ -53,7 +53,8 @@ class NeuroQueryModel(object):
         """
         model_dir = pathlib.Path(model_dir)
         vectorizer = tokenization.TextVectorizer.from_vocabulary_file(
-            str(model_dir / "vocabulary.csv"), voc_mapping="auto"
+            str(model_dir / "vocabulary.csv"), voc_mapping="auto",
+            add_unigrams=False
         )
         regression = smoothed_regression.SmoothedRegression.from_data_dir(
             str(model_dir)
@@ -81,7 +82,8 @@ class NeuroQueryModel(object):
         )
         if self.corpus_info is not None:
             sparse.save_npz(
-                str(model_dir / "corpus_tfidf.npz"), self.corpus_info["tfidf"])
+                str(model_dir / "corpus_tfidf.npz"),
+                sparse.csr_matrix(self.corpus_info["tfidf"]))
             self.corpus_info["metadata"].to_csv(
                 str(model_dir / "corpus_metadata.csv"), index=False)
 
