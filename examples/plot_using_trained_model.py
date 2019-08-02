@@ -117,12 +117,20 @@ print(
     .head()
 )
 
+######################################################################
+# "similar_documents" contains a list of related studies.
+# for each study it provides its PubMed ID, title, similarity to the query, and
+# a link to its PubMed page.
+
+print("\nsimilar studies:\n")
+print(response["similar_documents"].head())
 
 ######################################################################
 # Finally, "highlighted_text" contains the text of the query itself, with
 # markups that indicates which terms were recognized and used by the model
 # (usually terms related to neuroimaging):
 
+print("\ntokenized query:\n")
 print(response["highlighted_text"])
 
 # `print_highlighted_text` can help display it in a terminal for debugging.

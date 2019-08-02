@@ -31,3 +31,9 @@ view_img(result["z_map"], threshold=3.1).open_in_browser()
 # Display some relevant terms:
 
 print(result["similar_words"].head(15))
+
+######################################################################
+# Display some relevant studies:
+
+print("\nsimilar studies:\n")
+print(result["similar_documents"].head())
