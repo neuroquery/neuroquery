@@ -64,12 +64,15 @@ def test_neuroquery_model():
     tfidf[:n_docs, :n_docs] = np.eye(n_docs)
     metadata = pd.DataFrame.from_dict({"id": np.arange(n_docs)})
     encoder = encoding.NeuroQueryModel(
-        vect, reg, mask_img=_mask_img(y.shape[1]),
-        corpus_info={"tfidf": tfidf, "metadata": metadata}
+        vect,
+        reg,
+        mask_img=_mask_img(y.shape[1]),
+        corpus_info={"tfidf": tfidf, "metadata": metadata},
     )
     for i in range(n_docs):
         res = encoder(encoder.full_vocabulary()[i])
-        assert res["similar_documents"].id[0] == i
+        assert res["similar_documents"]["id"][0] == i
+        assert res["similar_words"]["n_documents"][0] == 1
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         encoder.to_data_dir(tmp_dir)

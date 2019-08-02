@@ -38,6 +38,16 @@ class NeuroQueryModel(object):
         Mask of the regression targets. The non-zero voxels correspond to the
         dependent variables.
 
+    corpus_info : dict, optional (default=None)
+        Data required to report which studies are most relevant for a query.
+        Must contain:
+            - "metadata": pandas DataFrame, each row describing a study
+            - "tfidf": scipy sparse matrix or numpy array, TFIDF features for
+              the documents. Rows must correspond to the same studies as in
+              "metadata", and columns to the terms in the vectorizer's
+              vocabulary.
+        If corpus_info is not available the model will not report most similar
+        studies.
     """
 
     @classmethod
@@ -49,12 +59,14 @@ class NeuroQueryModel(object):
         model_dir : str
             path to a directory containing the serialized trained model.
             The directory must be organized as the one returned by
-            `neuroquery.datasets.fetch_neuroquery_model`.
+            `neuroquery.datasets.fetch_neuroquery_model`, except that
+            `corpus_metadata.csv` and `corpus_tfidf.npz` are optional.
         """
         model_dir = pathlib.Path(model_dir)
         vectorizer = tokenization.TextVectorizer.from_vocabulary_file(
-            str(model_dir / "vocabulary.csv"), voc_mapping="auto",
-            add_unigrams=False
+            str(model_dir / "vocabulary.csv"),
+            voc_mapping="auto",
+            add_unigrams=False,
         )
         regression = smoothed_regression.SmoothedRegression.from_data_dir(
             str(model_dir)
@@ -66,7 +78,8 @@ class NeuroQueryModel(object):
             corpus_info = {}
             corpus_info["tfidf"] = sparse.load_npz(str(corpus_tfidf))
             corpus_info["metadata"] = pd.read_csv(
-                str(corpus_metadata), encoding="utf-8")
+                str(corpus_metadata), encoding="utf-8"
+            )
         else:
             corpus_info = None
         return cls(vectorizer, regression, mask_img, corpus_info=corpus_info)
@@ -83,12 +96,15 @@ class NeuroQueryModel(object):
         if self.corpus_info is not None:
             sparse.save_npz(
                 str(model_dir / "corpus_tfidf.npz"),
-                sparse.csr_matrix(self.corpus_info["tfidf"]))
+                sparse.csr_matrix(self.corpus_info["tfidf"]),
+            )
             self.corpus_info["metadata"].to_csv(
-                str(model_dir / "corpus_metadata.csv"), index=False)
+                str(model_dir / "corpus_metadata.csv"), index=False
+            )
 
-    def __init__(self, vectorizer, smoothed_regression, mask_img,
-                 corpus_info=None):
+    def __init__(
+        self, vectorizer, smoothed_regression, mask_img, corpus_info=None
+    ):
         self.vectorizer = vectorizer
         self.smoothed_regression = smoothed_regression
         self.mask_img = mask_img
@@ -111,6 +127,17 @@ class NeuroQueryModel(object):
         """Terms selected as features for the supervised regression."""
         return np.asarray(self.full_vocabulary())[self._supervised_features()]
 
+    def document_frequencies(self):
+        if self.corpus_info is None:
+            return None
+        if not hasattr(self, "document_frequencies_"):
+            document_frequencies = (self.corpus_info["tfidf"] > 0).sum(axis=0)
+            document_frequencies = np.asarray(document_frequencies).ravel()
+            self.document_frequencies_ = pd.Series(
+                document_frequencies, index=self.full_vocabulary()
+            )
+        return self.document_frequencies_
+
     def _similar_words(self, tfidf, vocabulary=None):
         if vocabulary is None:
             vocabulary = self.full_vocabulary()
@@ -125,13 +152,15 @@ class NeuroQueryModel(object):
         if self.corpus_info is None:
             return None
         similarities = safe_sparse_dot(
-            tfidf, self.corpus_info["tfidf"].T, dense_output=True).ravel()
+            tfidf, self.corpus_info["tfidf"].T, dense_output=True
+        ).ravel()
         order = np.argsort(similarities)[::-1]
         order = order[similarities[order] > 0][:_MAX_SIMILAR_DOCS_RETURNED]
         ordered_simil = similarities[order]
-        similar_docs = self.corpus_info["metadata"].iloc[order].reset_index(
-            drop=True)
-        similar_docs['similarity'] = ordered_simil
+        similar_docs = (
+            self.corpus_info["metadata"].iloc[order].reset_index(drop=True)
+        )
+        similar_docs["similarity"] = ordered_simil
         return similar_docs
 
     def _beta_norms(self):
@@ -198,6 +227,9 @@ class NeuroQueryModel(object):
                 - "weight_in_brain_map" is the contribution of the term in the
                   predicted "z_map".
                 - "weight_in_query" is the TFIDF of the term in `document`.
+            - "similar_documents": if no corpus_info was provided, this is
+              `None`. Otherwise it is a DataFrame containing information about
+              the most relevant studies.
             - "highlighted_text": an XML document showing which terms were
               recognized in the provided text.
             - "smoothed_tfidf": the tfidf after semantic smoothing.
@@ -222,9 +254,22 @@ class NeuroQueryModel(object):
         similar_words.sort_values(
             by="weight_in_brain_map", ascending=False, inplace=True
         )
+        doc_freq = self.document_frequencies()
+        if doc_freq is not None:
+            similar_words["n_documents"] = doc_freq.loc[similar_words.index]
+            similar_words = similar_words.loc[
+                :,
+                [
+                    "similarity",
+                    "weight_in_brain_map",
+                    "weight_in_query",
+                    "n_documents",
+                ],
+            ]
         result["similar_words"] = similar_words
         result["similar_documents"] = self.similar_documents(
-            result["smoothed_tfidf"])
+            result["smoothed_tfidf"]
+        )
         self._supervised_vocabulary_set()
         result[
             "highlighted_text"
