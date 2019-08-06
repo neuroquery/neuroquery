@@ -46,3 +46,20 @@ def fetch_neuroquery_model(data_dir=None):
         return str(out_dir)
     _download_neuroquery_model(str(out_dir))
     return str(out_dir)
+
+
+def fetch_peak_coordinates(data_dir=None):
+    data_dir = pathlib.Path(get_neuroquery_data_dir(data_dir))
+    out_file = data_dir / "coordinates.csv"
+    if out_file.is_file():
+        return str(out_file)
+    print("Downloading coordinates ...")
+    resp = requests.get(
+        "https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
+        "master/training_data/coordinates.csv")
+    resp.raise_for_status()
+    out_file = str(out_file)
+    with open(out_file, 'wb') as f:
+        f.write(resp.content)
+    print("Downloaded.")
+    return out_file

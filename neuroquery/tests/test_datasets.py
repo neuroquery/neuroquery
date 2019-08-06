@@ -41,3 +41,15 @@ def test_get_neuroquery_data_dir():
             nq_dir = datasets.get_neuroquery_data_dir()
             assert nq_dir == str(pathlib.Path(tmp_dir) / "neuroquery_data")
             assert pathlib.Path(nq_dir).is_dir()
+
+
+def test_fetch_peak_coordinates():
+    resp = mock.Mock()
+    resp.content = b"peak_coordinates_test"
+    with mock.patch("requests.get", return_value=resp) as mock_get:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            coord_file = datasets.fetch_peak_coordinates(tmp_dir)
+            with open(coord_file) as f:
+                assert f.read() == "peak_coordinates_test"
+            coord_file = datasets.fetch_peak_coordinates(tmp_dir)
+            mock_get.assert_called_once()
