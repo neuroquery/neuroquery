@@ -1,5 +1,6 @@
 import pathlib
 
+from scipy import sparse
 from sklearn.base import BaseEstimator, RegressorMixin
 
 from neuroquery import ridge, nmf
@@ -45,6 +46,8 @@ class SmoothedRegression(BaseEstimator, RegressorMixin):
         self.smoothing_weight = smoothing_weight
 
     def fit(self, X, Y):
+        if sparse.issparse(X):
+            X = X.A
         self.smoothing_ = nmf.CovarianceSmoothing(
             n_components=self.n_components,
             smoothing_weight=self.smoothing_weight,

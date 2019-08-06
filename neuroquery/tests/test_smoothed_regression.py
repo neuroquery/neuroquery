@@ -1,6 +1,7 @@
 import tempfile
 
 import numpy as np
+from scipy import sparse
 
 from sklearn import datasets
 from sklearn.linear_model import RidgeCV
@@ -25,6 +26,7 @@ def test_predictions():
         n_components=5, smoothing_weight=1e-3
     )
     print(reg.fit(x, y).predict(x))
+    reg.fit(sparse.csr_matrix(x), y).predict(x)
     sk_reg = RidgeCV()
     score = cross_val_score(reg, x, y, cv=5)
     sk_score = cross_val_score(sk_reg, x, y, cv=5)
