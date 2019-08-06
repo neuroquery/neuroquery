@@ -1,12 +1,24 @@
 import numpy as np
+import pandas as pd
 
 from nilearn import image, input_data
 from nilearn.datasets import load_mni152_brain_mask
 
 
-def get_masker(mask_img=None):
+def get_masker(mask_img=None, target_affine=None):
+    if isinstance(mask_img, input_data.NiftiMasker):
+        return mask_img
     if mask_img is None:
         mask_img = load_mni152_brain_mask()
+    if target_affine is not None:
+        if np.ndim(target_affine) == 0:
+            target_affine = np.eye(3) * target_affine
+        elif np.ndim(target_affine) == 1:
+            target_affine = np.diag(target_affine)
+        mask_img = image.resample_img(
+            mask_img,
+            target_affine=target_affine,
+            interpolation='nearest')
     masker = input_data.NiftiMasker(mask_img=mask_img).fit()
     return masker
 
@@ -38,3 +50,20 @@ def gaussian_coord_smoothing(coords, mask_img=None, fwhm=8.0):
     peaks_img = coords_to_peaks_img(coords, mask_img=masker.mask_img_)
     img = image.smooth_img(peaks_img, fwhm=fwhm)
     return masker.inverse_transform(masker.transform(img).squeeze())
+
+
+def coordinates_to_maps(coordinates, target_affine=(4, 4, 4)):
+    masker = get_masker(target_affine=target_affine)
+    articles = coordinates.groupby("pmid")
+    images, img_pmids = [], []
+    for i, (pmid, coord) in enumerate(articles):
+        print(
+            "{:.1%} pmid: {:< 20}".format(i / len(articles), pmid),
+            end="\r",
+            flush=True,
+        )
+        img = gaussian_coord_smoothing(
+            coord.loc[:, ["x", "y", "z"]].values, fwhm=10., mask_img=masker)
+        images.append(masker.transform(img).ravel())
+        img_pmids.append(pmid)
+    return pd.DataFrame(images, index=img_pmids), masker
