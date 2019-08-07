@@ -56,10 +56,11 @@ def fetch_peak_coordinates(data_dir=None):
     print("Downloading coordinates ...")
     resp = requests.get(
         "https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
-        "master/training_data/coordinates.csv")
+        "master/training_data/coordinates.csv"
+    )
     resp.raise_for_status()
     out_file = str(out_file)
-    with open(out_file, 'wb') as f:
+    with open(out_file, "wb") as f:
         f.write(resp.content)
     print("Downloaded.")
     return out_file

@@ -33,14 +33,15 @@ from neuroquery.tokenization import TextVectorizer
 from neuroquery.encoding import NeuroQueryModel
 
 # Choose where to store the cache and the model once it is trained
-output_directory = 'trained_text_to_brain_model'
-cache_directory = 'cache'
+output_directory = "trained_text_to_brain_model"
+cache_directory = "cache"
 
 data_dir = pathlib.Path(datasets.fetch_neuroquery_model())
 
-corpus_metadata = pd.read_csv(str(data_dir / 'corpus_metadata.csv'))
+corpus_metadata = pd.read_csv(str(data_dir / "corpus_metadata.csv"))
 vectorizer = TextVectorizer.from_vocabulary_file(
-    str(data_dir / 'vocabulary.csv'))
+    str(data_dir / "vocabulary.csv")
+)
 
 # The TFIDF features stored with NeuroQuery data correspond to the terms in
 # `vocabulary.csv` and the studies in `corpus_metadata.csv`;
@@ -74,10 +75,11 @@ brain_maps = brain_maps.loc[pmids, :]
 ######################################################################
 # Train the regression model
 # --------------------------
-regressor = SmoothedRegression(alphas=[1., 10., 100.])
+regressor = SmoothedRegression(alphas=[1.0, 10.0, 100.0])
 
-print("Fitting smoothed regression model on {} samples...".format(
-    tfidf.shape[0]))
+print(
+    "Fitting smoothed regression model on {} samples...".format(tfidf.shape[0])
+)
 regressor.fit(tfidf, brain_maps.values)
 
 ######################################################################
@@ -88,9 +90,15 @@ regressor.fit(tfidf, brain_maps.values)
 # This is the type of object that we will serialize and that is used in other
 # examples.
 corpus_metadata = corpus_metadata.set_index("pmid").loc[pmids, :].reset_index()
-encoder = NeuroQueryModel(vectorizer, regressor, masker.mask_img_,
-                          corpus_info={"tfidf": sparse.csr_matrix(tfidf),
-                                       "metadata": corpus_metadata})
+encoder = NeuroQueryModel(
+    vectorizer,
+    regressor,
+    masker.mask_img_,
+    corpus_info={
+        "tfidf": sparse.csr_matrix(tfidf),
+        "metadata": corpus_metadata,
+    },
+)
 encoder.to_data_dir(output_directory)
 
 ######################################################################
@@ -99,19 +107,19 @@ encoder.to_data_dir(output_directory)
 query = "Reading words"
 print('Encoding "{}"'.format(query))
 
-result = encoder('huntington')
+result = encoder("huntington")
 
-plotting.view_img(result['z_map'], threshold=3.).open_in_browser()
+plotting.view_img(result["z_map"], threshold=3.0).open_in_browser()
 
 print("Similar words:")
-print(result['similar_words'].head())
+print(result["similar_words"].head())
 print("\nSimilar documents:")
-print(result['similar_documents'].head())
+print(result["similar_documents"].head())
 
-print('\nmodel saved in {}'.format(output_directory))
+print("\nmodel saved in {}".format(output_directory))
 
 # Display in notebook
-plotting.view_img(result['z_map'], threshold=3.)
+plotting.view_img(result["z_map"], threshold=3.0)
 
 ######################################################################
 # Now that the model is trained and saved, it can easily be loaded in a later
