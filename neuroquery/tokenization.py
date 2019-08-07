@@ -715,7 +715,7 @@ class TextVectorizer(object):
     def from_vocabulary_file(
         cls,
         voc_file,
-        voc_mapping={},
+        voc_mapping="auto",
         stemming="identity",
         stop_words="nltk",
         out_of_voc="ignore",

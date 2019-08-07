@@ -52,10 +52,22 @@ def gaussian_coord_smoothing(coords, mask_img=None, fwhm=8.0):
     return masker.inverse_transform(masker.transform(img).squeeze())
 
 
-def coordinates_to_maps(coordinates, target_affine=(4, 4, 4)):
-    masker = get_masker(target_affine=target_affine)
-    articles = coordinates.groupby("pmid")
+def coordinates_to_maps(coordinates, mask_img=None, target_affine=(4, 4, 4)):
+    print("Transforming {} coordinates for {} articles".format(
+        coordinates.shape[0], len(set(coordinates["pmid"]))))
+    masker = get_masker(mask_img=mask_img, target_affine=target_affine)
     images, img_pmids = [], []
+    for pmid, img in iter_coordinates_to_maps(
+            coordinates, mask_img=masker):
+        images.append(masker.transform(img).ravel())
+        img_pmids.append(pmid)
+    return pd.DataFrame(images, index=img_pmids), masker
+
+
+def iter_coordinates_to_maps(
+        coordinates, mask_img=None, target_affine=(4, 4, 4)):
+    masker = get_masker(mask_img=mask_img, target_affine=target_affine)
+    articles = coordinates.groupby("pmid")
     for i, (pmid, coord) in enumerate(articles):
         print(
             "{:.1%} pmid: {:< 20}".format(i / len(articles), pmid),
@@ -64,6 +76,4 @@ def coordinates_to_maps(coordinates, target_affine=(4, 4, 4)):
         )
         img = gaussian_coord_smoothing(
             coord.loc[:, ["x", "y", "z"]].values, fwhm=10., mask_img=masker)
-        images.append(masker.transform(img).ravel())
-        img_pmids.append(pmid)
-    return pd.DataFrame(images, index=img_pmids), masker
+        yield pmid, img

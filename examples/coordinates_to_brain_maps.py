@@ -21,25 +21,18 @@ parser.add_argument(
 parser.add_argument(
     "--fwhm", type=float, default=8.0, help="full width at half maximum"
 )
+parser.add_argument(
+    "--resolution", type=float, default=4.0,
+    help="resolution of created images in mm")
 args = parser.parse_args()
 
 out_dir = pathlib.Path(args.output_directory)
 out_dir.mkdir(parents=True, exist_ok=True)
 
 coordinates = pd.read_csv(args.coordinates_csv)
-articles = coordinates.groupby("pmid")
-for i, (pmid, article_coordinates) in enumerate(articles):
-    print(
-        "{:.1%} pmid: {:< 20}".format(i / len(articles), pmid),
-        end="\r",
-        flush=True,
-    )
-    img_file = out_dir / "pmid_{}.nii.gz".format(pmid)
-    if not img_file.is_file():
-        img = img_utils.gaussian_coord_smoothing(
-            article_coordinates.loc[:, ["x", "y", "z"]].values, fwhm=args.fwhm
-        )
-        img.to_filename(str(img_file))
+for pmid, img in img_utils.iter_coordinates_to_maps(
+        coordinates, target_affine=args.resolution):
+    img_file = img.to_filename(str(out_dir / "pmid_{}.nii.gz".format(pmid)))
 
 print("\n")
 print(out_dir)
