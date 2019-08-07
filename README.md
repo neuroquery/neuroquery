@@ -53,4 +53,6 @@ view_img(
 
 `neuroquery` also provides classes to train new models from scientific
 publications' text and stereotactic peak activation coordinates (see
-`training_neuroquery.py` in the examples).
+[`training_neuroquery.py`](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/master/examples/training_neuroquery.ipynb)
+in the examples).
+
