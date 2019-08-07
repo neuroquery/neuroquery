@@ -358,3 +358,5 @@ def test_text_vectorizer():
     )
     transformed = vect(docs)
     assert np.allclose(transformed.A[2, :4], [0.5, 0.5, 0.0, 0.0])
+    assert vect.get_feature_names() == vect.tokenizer.get_vocabulary()
+    assert vect.get_full_vocabulary() == vect.tokenizer.get_full_vocabulary()
