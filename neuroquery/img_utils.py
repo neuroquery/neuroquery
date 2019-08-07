@@ -45,7 +45,7 @@ def coords_to_peaks_img(coords, mask_img):
 
 
 def gaussian_coord_smoothing(
-    coords, mask_img=None, target_affine=None, fwhm=10.0
+    coords, mask_img=None, target_affine=None, fwhm=9.0
 ):
     masker = get_masker(mask_img, target_affine)
     peaks_img = coords_to_peaks_img(coords, mask_img=masker.mask_img_)
@@ -54,7 +54,7 @@ def gaussian_coord_smoothing(
 
 
 def coordinates_to_maps(
-    coordinates, mask_img=None, target_affine=(4, 4, 4), fwhm=10.0
+    coordinates, mask_img=None, target_affine=(4, 4, 4), fwhm=9.0
 ):
     print(
         "Transforming {} coordinates for {} articles".format(
@@ -72,7 +72,7 @@ def coordinates_to_maps(
 
 
 def iter_coordinates_to_maps(
-    coordinates, mask_img=None, target_affine=(4, 4, 4), fwhm=10.0
+    coordinates, mask_img=None, target_affine=(4, 4, 4), fwhm=9.0
 ):
     masker = get_masker(mask_img=mask_img, target_affine=target_affine)
     articles = coordinates.groupby("pmid")

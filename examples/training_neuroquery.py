@@ -13,7 +13,8 @@ This example is more computation-intensive than the others. It runs in around
 15 mn to fit the regression model) and uses up to 6 GB of memory.
 
 Note: for this demo we use a very coarse resolution of brain maps (6mm voxels),
-change `target_affine` to e.g. `(4, 4, 4)` to increase resolution.
+change `target_affine` to e.g. `(4, 4, 4)` to increase resolution. With 4mm
+resolution, the example requires around 60 mn and 14 GB of memory.
 """
 
 ######################################################################
@@ -58,10 +59,14 @@ coordinates = pd.read_csv(datasets.fetch_peak_coordinates())
 # this if we train a new model.
 coord_to_maps = Memory(cache_directory).cache(coordinates_to_maps)
 
-# You can set target_affine to a different value to increase image resolution.
-# The model on neuroquery.saclay.inria.fr uses 4 mm resolution i.e.
-# target_affine=(4, 4, 4)
-brain_maps, masker = coord_to_maps(coordinates, target_affine=(6, 6, 6))
+# You can set target_affine to a different value to increase image resolution
+# or reduce computation time. The model on neuroquery.saclay.inria.fr uses 4 mm
+# resolution i.e. target_affine=(4, 4, 4)
+# You can also adjust the smoothing by setting `fwhm` (Full Width at Half
+# maximum)
+brain_maps, masker = coord_to_maps(
+    coordinates, target_affine=(6, 6, 6), fwhm=9.0
+)
 brain_maps = brain_maps[(brain_maps.values != 0).any(axis=1)]
 
 ######################################################################
@@ -107,7 +112,7 @@ encoder.to_data_dir(output_directory)
 query = "Reading words"
 print('Encoding "{}"'.format(query))
 
-result = encoder("huntington")
+result = encoder(query)
 
 plotting.view_img(result["z_map"], threshold=3.0).open_in_browser()
 
@@ -126,3 +131,32 @@ plotting.view_img(result["z_map"], threshold=3.0)
 # session
 
 encoder = NeuroQueryModel.from_data_dir(output_directory)
+
+######################################################################
+# Summary
+# -------
+# We have trained and used a NeuroQuery model based on coordinates and TFIDF
+# features. As we have seen, in order to train a model, we need:
+# - An array of TFIDF features
+# - An array of masked brain maps (shape n samples x n voxels), which can be
+#   easily obtained from coordinates with `coordinates_to_maps`, such that each
+#   brain map corresponds to a row of the TFIDF matrix
+#
+# Then to construct a `NeuroQueryModel` that can answer queries, we also need
+# to build a `TextVectorizer`, either by reading a vocabulary file as is done
+# in this example, or simply by calling
+# `TextVectorizer.from_vocabulary(feature_names)`, where `feature_names` is a
+# list of strings giving the terms that correspond to each column of the TFIDF
+# matrix.
+# Finally, optionally, `NeuroQueryModel` can also be provided with data about
+# the corpus (e.g. article titles), which will be used to describe documents
+# related to queries if available.
+#
+# Therefore a model can be trained and used using a TFIDF matrix, a DataFrame
+# of coordinates or an array of brain maps, and a vocabulary list only. It does
+# not require a dataset on disk with any particular directory structure.
+#
+# Finally, the TFIDF features themselves can easily be obtained with
+# `TextVectorizer`, or similar vectorizers from `scikit-learn`, if you have a
+# corpus of text. Here we use the TFIDF distributed in `neuroquery_data`
+# because we do not have access to the corpus of text they were derived from.
