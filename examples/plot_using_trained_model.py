@@ -13,6 +13,7 @@ The model used here is the same as the one deployed on the neuroquery website
 ( https://neuroquery.saclay.inria.fr ), and this example shows how to easily
 reproduce the website's functionality in a Python script.
 
+You can run this example on binder: https://mybinder.org/v2/gh/neuroquery/neuroquery.git/master?filepath=examples
 """
 
 ######################################################################
