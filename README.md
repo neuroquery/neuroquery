@@ -34,8 +34,9 @@ pip install -U git+https://github.com/neuroquery/neuroquery.git
 
 ### Usage
 
-In the `examples` folder, `plot_using_trained_model.py` shows basic
-usage of `neuroquery`.
+In the `examples` folder, 
+[`minimal_example.ipynb`](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/master/examples/minimal_example.ipynb)
+shows basic usage of `neuroquery`.
 
 `neuroquery` has a function to download a trained model so that users can get
 started right away:
@@ -53,6 +54,6 @@ view_img(
 
 `neuroquery` also provides classes to train new models from scientific
 publications' text and stereotactic peak activation coordinates (see
-[`training_neuroquery.py`](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/master/examples/training_neuroquery.ipynb)
+[`training_neuroquery.ipynb`](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/master/examples/training_neuroquery.ipynb)
 in the examples).
 
