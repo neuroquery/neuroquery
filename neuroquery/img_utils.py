@@ -86,3 +86,14 @@ def iter_coordinates_to_maps(
             coord.loc[:, ["x", "y", "z"]].values, fwhm=fwhm, mask_img=masker
         )
         yield pmid, img
+
+
+def iter_coordinates_to_peaks_imgs(
+    coordinates, mask_img=None, target_affine=(4, 4, 4)
+):
+    myiter = iter_coordinates_to_maps(
+        coordinates, mask_img, target_affine, None
+    )
+
+    for _, img in myiter:
+        yield img
