@@ -1,4 +1,5 @@
 examples/cache/
+examples/examples_src/cache/
 examples/trained_text_to_brain_model/
 
 # Byte-compiled / optimized / DLL files
