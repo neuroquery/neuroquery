@@ -44,6 +44,14 @@ def coords_to_peaks_img(coords, mask_img):
     return peaks_img
 
 
+def coords_to_peaks_arr(coords, mask_img):
+    mask_img = image.load_img(mask_img)
+    voxels = coords_to_voxels(coords, mask_img)
+    peaks = np.zeros(mask_img.shape)
+    np.add.at(peaks, tuple(voxels.T), 1.0)
+    return peaks
+
+
 def gaussian_coord_smoothing(
     coords, mask_img=None, target_affine=None, fwhm=9.0
 ):
@@ -88,12 +96,24 @@ def iter_coordinates_to_maps(
         yield pmid, img
 
 
-def iter_coordinates_to_peaks_imgs(
+def iter_coordinates_to_arrs(
     coordinates, mask_img=None, target_affine=(4, 4, 4)
 ):
-    myiter = iter_coordinates_to_maps(
-        coordinates, mask_img, target_affine, None
-    )
+    masker = get_masker(mask_img=mask_img, target_affine=target_affine)
+    articles = coordinates.groupby("pmid")
+    for i, (pmid, coord) in enumerate(articles):
+        print(
+            "{:.1%} pmid: {:< 20}".format(i / len(articles), pmid),
+            end="\r",
+            flush=True,
+        )
+        arr = coords_to_peaks_arr(
+            coord.loc[:, ["x", "y", "z"]].values, mask_img=masker.mask_img_
+        )
+        yield arr
 
-    for _, img in myiter:
-        yield img
+def coordinates_to_arrs(
+    coordinates, mask_img=None, target_affine=(4, 4, 4)
+):
+    masker = get_masker(mask_img=mask_img, target_affine=target_affine)
+    return iter_coordinates_to_arrs(coordinates, masker), masker
