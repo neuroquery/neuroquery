@@ -36,10 +36,7 @@ def coords_to_voxels(coords, ref_img=None):
 
 
 def coords_to_peaks_img(coords, mask_img):
-    mask_img = image.load_img(mask_img)
-    voxels = coords_to_voxels(coords, mask_img)
-    peaks = np.zeros(mask_img.shape)
-    np.add.at(peaks, tuple(voxels.T), 1.0)
+    peaks = coords_to_peaks_arr(coords, mask_img)
     peaks_img = image.new_img_like(mask_img, peaks)
     return peaks_img
 
