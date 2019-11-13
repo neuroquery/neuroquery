@@ -67,3 +67,33 @@ def test_coordinates_to_maps():
     assert np.allclose(
         masker.transform(img_17), maps.loc[17, :].values, atol=1e-10
     )
+
+
+def test_coordinates_to_arrs():
+    coords = pd.DataFrame.from_dict(
+        {
+            "pmid": [3, 17, 17, 2, 2],
+            "x": [0.0, 0.0, 10.0, 5.0, 3.0],
+            "y": [0.0, 0.0, -10.0, 15.0, -9.0],
+            "z": [27.0, 0.0, 30.0, 17.0, 77.0],
+        }
+    )
+    iter_arrs, masker = img_utils.coordinates_to_arrs(coords)
+    affine = masker.mask_img.affine
+
+    ijk = []
+    xyz = [(5, 15, 17), (3, -9, 77), (0, 0, 27), (0, 0, 0), (10, -10, 30)]
+
+    for x, y, z in xyz:
+        i, j, k, _ = np.floor((np.linalg.pinv(affine) @ np.array([[x, y, z, 1]]).T)).astype(int)
+        ijk.append((i, j, k))
+
+    arr2 = next(iter_arrs)
+    arr3 = next(iter_arrs)
+    arr17 = next(iter_arrs)
+
+    assert arr2[ijk[0]] == 1
+    assert arr2[ijk[1]] == 1
+    assert arr3[ijk[2]] == 1
+    assert arr17[ijk[3]] == 1
+    assert arr17[ijk[4]] == 1
