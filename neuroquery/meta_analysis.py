@@ -10,7 +10,7 @@ def _uniform_kernel(r, n1=1, n2=1, n3=1):
     """Build an uniform 3D kernel.
 
     Args:
-        r (int): Sphere radius.
+        r (int): Sphere radius >= 1.
         n1 (int): Normalization factor on the 1st axis.
         n2 (int): Normalization factor on the 2nd axis.
         n3 (int): Normalization factor on the 3rd axis.
@@ -38,21 +38,7 @@ def _uniform_kernel(r, n1=1, n2=1, n3=1):
     return kernel
 
 
-def MKDA(peaks_arrs, affine, r=15):
-    """Implement MKDA method.
-
-    Args:
-        peaks_arrs (list): List or generator of 3D arrays. Each array
-            stores the activation peaks of one study. Each array is assumed to
-            be of the same shape.
-        affine (array): Affine shared by the arrays.
-        r (float): Radius of the uniform kernel used by MKDA (mm).
-            Defaults to 15.
-
-    Returns:
-        (Niimg-like object): Meta-analysis map
-
-    """
+def _KDA_MKDA(peaks_arrs, affine, r=15, MKDA=False):
     if not peaks_arrs:
         raise ValueError('No map provided.')
 
@@ -68,7 +54,44 @@ def MKDA(peaks_arrs, affine, r=15):
 
     for peaks_arr in peaks_arrs:
         arr = convolve(peaks_arr, kernel, mode='constant')
-        arr = arr > 0
+        if MKDA:
+            arr = arr > 0
         mkda_arr += arr
 
     return nib.Nifti1Image(mkda_arr, affine)
+
+
+def KDA(peaks_arrs, affine, r=15):
+    """Implement KDA method.
+
+    Args:
+        peaks_arrs (list): List or generator of 3D arrays. Each array
+            stores the activation peaks of one study. Each array is assumed to
+            be of the same shape.
+        affine (array): Affine shared by the arrays.
+        r (float): Radius of the uniform kernel used by MKDA (mm).
+            Defaults to 15.
+
+    Returns:
+        (Niimg-like object): Meta-analysis map
+
+    """
+    return _KDA_MKDA(peaks_arrs, affine, r, MKDA=False)
+
+
+def MKDA(peaks_arrs, affine, r=15):
+    """Implement MKDA method.
+
+    Args:
+        peaks_arrs (list): List or generator of 3D arrays. Each array
+            stores the activation peaks of one study. Each array is assumed to
+            be of the same shape.
+        affine (array): Affine shared by the arrays.
+        r (float): Radius of the uniform kernel used by MKDA (mm).
+            Defaults to 15.
+
+    Returns:
+        (Niimg-like object): Meta-analysis map
+
+    """
+    return _KDA_MKDA(peaks_arrs, affine, r, MKDA=True)
