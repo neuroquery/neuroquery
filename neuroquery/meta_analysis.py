@@ -10,7 +10,7 @@ def _uniform_kernel(r, n1=1, n2=1, n3=1):
     """Build an uniform 3D kernel.
 
     Args:
-        r (int): Sphere radius.
+        r (int): Sphere radius >= 1.
         n1 (int): Normalization factor on the 1st axis.
         n2 (int): Normalization factor on the 2nd axis.
         n3 (int): Normalization factor on the 3rd axis.
