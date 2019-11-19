@@ -36,12 +36,12 @@ def coords_to_voxels(coords, ref_img=None):
 
 
 def coords_to_peaks_img(coords, mask_img):
-    peaks = coords_to_peaks_arr(coords, mask_img)
+    peaks = coords_to_peaks_array(coords, mask_img)
     peaks_img = image.new_img_like(mask_img, peaks)
     return peaks_img
 
 
-def coords_to_peaks_arr(coords, mask_img):
+def coords_to_peaks_array(coords, mask_img):
     mask_img = image.load_img(mask_img)
     voxels = coords_to_voxels(coords, mask_img)
     peaks = np.zeros(mask_img.shape)
@@ -93,7 +93,7 @@ def iter_coordinates_to_maps(
         yield pmid, img
 
 
-def iter_coordinates_to_arrs(
+def iter_coordinates_to_arrays(
     coordinates, mask_img=None, target_affine=(4, 4, 4)
 ):
     masker = get_masker(mask_img=mask_img, target_affine=target_affine)
@@ -104,13 +104,13 @@ def iter_coordinates_to_arrs(
             end="\r",
             flush=True,
         )
-        arr = coords_to_peaks_arr(
+        array = coords_to_peaks_array(
             coord.loc[:, ["x", "y", "z"]].values, mask_img=masker.mask_img_
         )
-        yield arr
+        yield array
 
-def coordinates_to_arrs(
+def coordinates_to_arrays(
     coordinates, mask_img=None, target_affine=(4, 4, 4)
 ):
     masker = get_masker(mask_img=mask_img, target_affine=target_affine)
-    return iter_coordinates_to_arrs(coordinates, masker), masker
+    return iter_coordinates_to_arrays(coordinates, masker), masker
