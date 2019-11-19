@@ -69,7 +69,7 @@ def test_coordinates_to_maps():
     )
 
 
-def test_coordinates_to_arrs():
+def test_coordinates_to_arrays():
     coords = pd.DataFrame.from_dict(
         {
             "pmid": [3, 17, 17, 2, 2],
@@ -78,7 +78,7 @@ def test_coordinates_to_arrs():
             "z": [27.0, 0.0, 30.0, 17.0, 77.0],
         }
     )
-    iter_arrs, masker = img_utils.coordinates_to_arrs(coords)
+    iter_arrs, masker = img_utils.coordinates_to_arrays(coords)
     affine = masker.mask_img.affine
 
     ijk = []
