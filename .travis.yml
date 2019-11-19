@@ -1,6 +1,6 @@
 language: python
 env:
-  - CONDA_DEPENDENCIES='nilearn sklearn pandas regex nltk numpy scipy lxml python-Levenshtein pytest-cov codecov'
+  - CONDA_DEPENDENCIES='nilearn sklearn pandas regex nltk numpy scipy lxml python-Levenshtein pytest-cov codecov hypothesis'
 python:
   - 3.6
 install:
