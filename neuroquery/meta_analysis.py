@@ -9,14 +9,20 @@ from scipy.ndimage.filters import convolve
 def _uniform_kernel(r, n1=1, n2=1, n3=1):
     """Build an uniform 3D kernel.
 
-    Args:
-        r (int): Sphere radius >= 1.
-        n1 (int): Normalization factor on the 1st axis.
-        n2 (int): Normalization factor on the 2nd axis.
-        n3 (int): Normalization factor on the 3rd axis.
+    Parameters
+    ----------
+        r : int
+            Sphere radius >= 1.
+        n1 : int
+            Normalization factor on the 1st axis.
+        n2 : int
+            Normalization factor on the 2nd axis.
+        n3 : int
+            Normalization factor on the 3rd axis.
 
     Returns:
-        (array like) Array of shape (r//n1, r//n2, r//n3) storing the kernel.
+        array like
+            Array of shape (r//n1, r//n2, r//n3) storing the kernel.
 
     """
     A, B, C = r, r, r
@@ -64,16 +70,28 @@ def _KDA_MKDA(peaks_arrs, affine, r=15, MKDA=False):
 def KDA(peaks_arrs, affine, r=15):
     """Implement KDA method.
 
-    Args:
-        peaks_arrs (list): List or generator of 3D arrays. Each array
-            stores the activation peaks of one study. Each array is assumed to
-            be of the same shape.
-        affine (array): Affine shared by the arrays.
-        r (float): Radius of the uniform kernel used by MKDA (mm).
+    Parameters
+    ----------
+        peaks_arrs : list or generator of 3D arrays.
+            Each array stores the activation peaks of one study. Each array
+            is assumed to be of the same shape.
+        affine : array
+            Affine shared by the arrays.
+        r : float
+            Radius of the uniform kernel used by MKDA (mm).
             Defaults to 15.
 
-    Returns:
-        (Niimg-like object): Meta-analysis map
+    Returns
+    -------
+    Niimg-like object
+        The meta-analysis map
+
+    References
+    ----------
+    .. [1] Tor D. Wager, Martin Lindquist, Lauren Kaplan, Meta-analysis of
+    functional neuroimaging data: current and future directions, Social
+    Cognitive and Affective Neuroscience, Volume 2, Issue 2, June 2007,
+    Pages 150–158, https://doi.org/10.1093/scan/nsm015
 
     """
     return _KDA_MKDA(peaks_arrs, affine, r, MKDA=False)
@@ -82,16 +100,28 @@ def KDA(peaks_arrs, affine, r=15):
 def MKDA(peaks_arrs, affine, r=15):
     """Implement MKDA method.
 
-    Args:
-        peaks_arrs (list): List or generator of 3D arrays. Each array
-            stores the activation peaks of one study. Each array is assumed to
+    Parameters
+    ----------
+        peaks_arrs : list or generator of 3D arrays.
+            Each array stores the activation peaks of one study. Each array is assumed to
             be of the same shape.
-        affine (array): Affine shared by the arrays.
-        r (float): Radius of the uniform kernel used by MKDA (mm).
+        affine : array
+            Affine shared by the arrays.
+        r : float
+            Radius of the uniform kernel used by MKDA (mm).
             Defaults to 15.
 
-    Returns:
-        (Niimg-like object): Meta-analysis map
+    Returns
+    -------
+        Niimg-like object
+            The meta-analysis map
+
+    References
+    ----------
+    .. [1] Tor D. Wager, Martin Lindquist, Lauren Kaplan, Meta-analysis of
+    functional neuroimaging data: current and future directions, Social
+    Cognitive and Affective Neuroscience, Volume 2, Issue 2, June 2007,
+    Pages 150–158, https://doi.org/10.1093/scan/nsm015
 
     """
     return _KDA_MKDA(peaks_arrs, affine, r, MKDA=True)
