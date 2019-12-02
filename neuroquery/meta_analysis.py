@@ -4,42 +4,36 @@ import numpy as np
 import nibabel as nib
 from scipy.ndimage.filters import convolve
 
-from neuroquery.img_utils import _uniform_kernel
+from neuroquery.img_utils import _uniform_kernel, coordinates_to_arrays
 
 
-def _KDA_MKDA(peaks_arrs, affine, r=15, MKDA=False):
-    if not peaks_arrs:
-        raise ValueError('No map provided.')
+def _KDA_MKDA(coordinates, r=15, MKDA=False):
+    iter_arrays, masker = coordinates_to_arrays(coordinates)
+    affine = masker.mask_img_.affine
 
-    # Convert to iterator if not already the case
-    peaks_arrs = iter(peaks_arrs)
-
-    mkda_arr = next(peaks_arrs)
+    mkda_array = next(iter_arrays)
 
     n1 = affine[0, 0]
     n2 = affine[1, 1]
     n3 = affine[2, 2]
     kernel = _uniform_kernel(r, n1, n2, n3)
 
-    for peaks_arr in peaks_arrs:
-        arr = convolve(peaks_arr, kernel, mode='constant')
+    for array in iter_arrays:
+        array = convolve(array, kernel, mode='constant')
         if MKDA:
-            arr = arr > 0
-        mkda_arr += arr
+            array = array > 0
+        mkda_array += array
 
-    return nib.Nifti1Image(mkda_arr, affine)
+    return nib.Nifti1Image(mkda_array, affine)
 
 
-def KDA(peaks_arrs, affine, r=15):
+def KDA(coordinates, r=15):
     """Implement KDA method.
 
     Parameters
     ----------
-        peaks_arrs : list or generator of 3D arrays.
-            Each array stores the activation peaks of one study. Each array
-            is assumed to be of the same shape.
-        affine : array
-            Affine shared by the arrays.
+        coordinates : pandas.DataFrame
+            Data frame storing the coordintaes.
         r : float
             Radius of the uniform kernel used by MKDA (mm).
             Defaults to 15.
@@ -57,19 +51,17 @@ def KDA(peaks_arrs, affine, r=15):
     Pages 150–158, https://doi.org/10.1093/scan/nsm015
 
     """
-    return _KDA_MKDA(peaks_arrs, affine, r, MKDA=False)
+    return _KDA_MKDA(coordinates, r, MKDA=False)
 
 
-def MKDA(peaks_arrs, affine, r=15):
+def MKDA(coordinates, r=15):
     """Implement MKDA method.
 
     Parameters
     ----------
-        peaks_arrs : list or generator of 3D arrays.
-            Each array stores the activation peaks of one study. Each array is assumed to
-            be of the same shape.
-        affine : array
-            Affine shared by the arrays.
+        coordinates : pandas.DataFrame
+            Data frame storing the coordintaes.
+
         r : float
             Radius of the uniform kernel used by MKDA (mm).
             Defaults to 15.
@@ -87,4 +79,4 @@ def MKDA(peaks_arrs, affine, r=15):
     Pages 150–158, https://doi.org/10.1093/scan/nsm015
 
     """
-    return _KDA_MKDA(peaks_arrs, affine, r, MKDA=True)
+    return _KDA_MKDA(coordinates, r, MKDA=True)
