@@ -8,6 +8,9 @@ from neuroquery.img_utils import _uniform_kernel, coordinates_to_arrays
 
 
 def _KDA_MKDA(coordinates, r=15, MKDA=False):
+    if coordinates.empty:
+        raise ValueError('Data frame empty.')
+
     iter_arrays, masker = coordinates_to_arrays(coordinates)
     affine = masker.mask_img_.affine
 
@@ -32,11 +35,11 @@ def KDA(coordinates, r=15):
 
     Parameters
     ----------
-        coordinates : pandas.DataFrame
-            Data frame storing the coordintaes.
-        r : float
-            Radius of the uniform kernel used by MKDA (mm).
-            Defaults to 15.
+    coordinates : pandas.DataFrame
+        Data frame storing the coordintaes.
+    r : float
+        Radius of the uniform kernel used by MKDA (mm).
+        Defaults to 15.
 
     Returns
     -------
@@ -59,17 +62,17 @@ def MKDA(coordinates, r=15):
 
     Parameters
     ----------
-        coordinates : pandas.DataFrame
-            Data frame storing the coordintaes.
+    coordinates : pandas.DataFrame
+        Data frame storing the coordintaes.
 
-        r : float
-            Radius of the uniform kernel used by MKDA (mm).
-            Defaults to 15.
+    r : float
+        Radius of the uniform kernel used by MKDA (mm).
+        Defaults to 15.
 
     Returns
     -------
-        Niimg-like object
-            The meta-analysis map
+    Niimg-like object
+        The meta-analysis map
 
     References
     ----------
