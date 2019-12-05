@@ -48,15 +48,15 @@ def fetch_neuroquery_model(data_dir=None):
     return str(out_dir)
 
 
-def fetch_peak_coordinates(data_dir=None):
+def _fetch_neuroquery_data(filename, data_dir=None):
     data_dir = pathlib.Path(get_neuroquery_data_dir(data_dir))
-    out_file = data_dir / "coordinates.csv"
+    out_file = data_dir / filename
     if out_file.is_file():
         return str(out_file)
-    print("Downloading coordinates ...")
+    print(f"Downloading {filename} ...")
     resp = requests.get(
-        "https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
-        "master/training_data/coordinates.csv"
+        f"https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
+        f"master/training_data/{filename}"
     )
     resp.raise_for_status()
     out_file = str(out_file)
@@ -64,3 +64,19 @@ def fetch_peak_coordinates(data_dir=None):
         f.write(resp.content)
     print("Downloaded.")
     return out_file
+
+
+def fetch_peak_coordinates(data_dir=None):
+    return _fetch_neuroquery_data('coordinates.csv', data_dir)
+
+
+def fetch_tfidf(data_dir=None):
+    return _fetch_neuroquery_data('corpus_tfidf.npz', data_dir)
+
+
+def fetch_pmids(data_dir=None):
+    return _fetch_neuroquery_data('pmids.txt', data_dir)
+
+
+def fetch_keywords(data_dir=None):
+    return _fetch_neuroquery_data('feature_names.txt', data_dir)
