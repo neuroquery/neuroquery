@@ -8,31 +8,7 @@ from hypothesis import strategies as strats
 from numpy.random import randint, uniform
 
 from neuroquery import meta_analysis
-
-
-affine = np.array([[-2.,    0.,    0.,   90.],
-                [0.,    2.,    0., -126.],
-                [0.,    0.,    2.,  -72.],
-                [0.,    0.,    0.,    1.]])
-
-
-def random_coordinates(NS, N_max):
-    """Generate a random coordinates dataframe."""
-    L = []
-    for s in range(NS):
-        n_peaks = randint(1, N_max)
-        peaks = uniform(low=(0, 0, 0, 1), high=(91, 109, 91, 2), size=(n_peaks, 4))
-        x, y, z, _ = affine @ peaks.T
-        L.append(np.array((x, y, z, s*np.ones(n_peaks))))
-
-    x, y, z, pmids = np.hstack(L)
-
-    return pd.DataFrame(data={
-        'x': x,
-        'y': y,
-        'z': z,
-        'pmid': pmids
-    })
+from neuroquery.tests.test_data_utils import random_coordinates
 
 
 def test_uniform_kernel():
@@ -75,12 +51,11 @@ def test_uniform_kernel():
 
 
 @given(
-    NS=strats.integers(min_value=1, max_value=10),
-    N_max=strats.integers(min_value=2, max_value=100)
+    data=random_coordinates()
 )
-def test_KDA(NS, N_max):
+def test_KDA(data):
     """Test the KDA meta_analysis."""
-    coordinates = random_coordinates(NS, N_max)
+    coordinates, NS, N_max = data
 
     KDA = meta_analysis.KDA(coordinates, r=5).get_fdata()
 
@@ -91,12 +66,11 @@ def test_KDA(NS, N_max):
         meta_analysis.MKDA(pd.DataFrame({'A': []}), r=5)
 
 @given(
-    NS=strats.integers(min_value=1, max_value=10),
-    N_max=strats.integers(min_value=2, max_value=100)
+    data=random_coordinates()
 )
-def test_MKDA(NS, N_max):
+def test_MKDA(data):
     """Test the MKDA meta_analysis."""
-    coordinates = random_coordinates(NS, N_max)
+    coordinates, NS, N_max = data
 
     MKDA = meta_analysis.MKDA(coordinates, r=5).get_fdata()
 
