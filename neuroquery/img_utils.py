@@ -121,18 +121,19 @@ def _uniform_kernel(r, n1=1, n2=1, n3=1):
 
     Parameters
     ----------
-        r : int
-            Sphere radius >= 1.
-        n1 : int
-            Normalization factor on the 1st axis.
-        n2 : int
-            Normalization factor on the 2nd axis.
-        n3 : int
-            Normalization factor on the 3rd axis.
+    r : int
+        Sphere radius >= 1.
+    n1 : int
+        Normalization factor on the 1st axis.
+    n2 : int
+        Normalization factor on the 2nd axis.
+    n3 : int
+        Normalization factor on the 3rd axis.
 
-    Returns:
-        array like
-            Array of shape (r//n1, r//n2, r//n3) storing the kernel.
+    Returns
+    -------
+    array like
+        Array of shape (r//n1, r//n2, r//n3) storing the kernel.
 
     """
     A, B, C = r, r, r
