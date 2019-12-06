@@ -53,3 +53,39 @@ def test_fetch_peak_coordinates():
                 assert f.read() == "peak_coordinates_test"
             coord_file = datasets.fetch_peak_coordinates(tmp_dir)
             mock_get.assert_called_once()
+
+
+def test_fetch_tfidf():
+    resp = mock.Mock()
+    resp.content = b"tfidf_test"
+    with mock.patch("requests.get", return_value=resp) as mock_get:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            coord_file = datasets.fetch_tfidf(tmp_dir)
+            with open(coord_file) as f:
+                assert f.read() == "tfidf_test"
+            coord_file = datasets.fetch_tfidf(tmp_dir)
+            mock_get.assert_called_once()
+
+
+def test_fetch_pmids():
+    resp = mock.Mock()
+    resp.content = b"pmids_test"
+    with mock.patch("requests.get", return_value=resp) as mock_get:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            coord_file = datasets.fetch_pmids(tmp_dir)
+            with open(coord_file) as f:
+                assert f.read() == "pmids_test"
+            coord_file = datasets.fetch_pmids(tmp_dir)
+            mock_get.assert_called_once()
+
+
+def test_fetch_keywords():
+    resp = mock.Mock()
+    resp.content = b"keywords_test"
+    with mock.patch("requests.get", return_value=resp) as mock_get:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            coord_file = datasets.fetch_keywords(tmp_dir)
+            with open(coord_file) as f:
+                assert f.read() == "keywords_test"
+            coord_file = datasets.fetch_keywords(tmp_dir)
+            mock_get.assert_called_once()
