@@ -1,11 +1,8 @@
 """Test the meta_analysis.py file."""
-import scipy
 import pandas as pd
 import numpy as np
 import pytest
 from hypothesis import given
-from hypothesis import strategies as strats
-from numpy.random import randint, uniform
 
 from neuroquery import meta_analysis
 from neuroquery.tests.test_data_utils import random_coordinates
@@ -50,9 +47,7 @@ def test_uniform_kernel():
     assert kern2[10, 6, 5] == 0
 
 
-@given(
-    data=random_coordinates()
-)
+@given(data=random_coordinates())
 def test_KDA(data):
     """Test the KDA meta_analysis."""
     coordinates, NS, N_max = data
@@ -65,9 +60,8 @@ def test_KDA(data):
     with pytest.raises(ValueError):
         meta_analysis.MKDA(pd.DataFrame({'A': []}), r=5)
 
-@given(
-    data=random_coordinates()
-)
+
+@given(data=random_coordinates())
 def test_MKDA(data):
     """Test the MKDA meta_analysis."""
     coordinates, NS, N_max = data

@@ -1,9 +1,7 @@
 """Test the meta_analysis.py file."""
 import tempfile
-import scipy
 import pandas as pd
 import numpy as np
-import pytest
 from hypothesis import given
 from hypothesis import strategies as strats
 from numpy.random import randint, uniform
@@ -12,9 +10,9 @@ from neuroquery import data_utils
 
 
 affine = np.array([[-2.,    0.,    0.,   90.],
-                [0.,    2.,    0., -126.],
-                [0.,    0.,    2.,  -72.],
-                [0.,    0.,    0.,    1.]])
+                   [0.,    2.,    0., -126.],
+                   [0.,    0.,    2.,  -72.],
+                   [0.,    0.,    0.,    1.]])
 
 
 @strats.composite

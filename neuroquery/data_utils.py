@@ -13,7 +13,7 @@ def build_index(I):
     Returns
     -------
     encode : dict
-        key : index of iteration over the iterable.
+        key : index of the object found in the iterable.
         value : object at the specified index.
     decode : dict
         Reverse of encode.
@@ -43,7 +43,8 @@ def select_pmids(coordinates, pmids):
     Returns
     -------
     pandas.DataFrame
-        Same columns as the input data frame but with some rows eliminated.
+        Same columns as the input data frame but with specified pmids (rows)
+        eliminated.
 
     """
     return coordinates[coordinates['pmid'].isin(pmids)]
@@ -68,7 +69,7 @@ def which_pmids(tfidf, pmids_iter, keywords_iter, keyword):
     Returns
     -------
     list
-        list of publications' id related to the keyword according to the tfidf
+        list of publications' ids related to the keyword according to the tfidf
         matrix.
     """
     _, decode_pmid = build_index(pmids_iter)

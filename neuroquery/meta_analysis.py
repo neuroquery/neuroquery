@@ -44,7 +44,7 @@ def KDA(coordinates, r=15):
     Returns
     -------
     Niimg-like object
-        The meta-analysis map
+        The meta-analysis map.
 
     References
     ----------
@@ -72,7 +72,7 @@ def MKDA(coordinates, r=15):
     Returns
     -------
     Niimg-like object
-        The meta-analysis map
+        The meta-analysis map.
 
     References
     ----------
