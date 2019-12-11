@@ -49,21 +49,20 @@ def test_build_index():
     assert decode[2] == 'kw3'
 
     # Test with a file
-    file = tempfile.NamedTemporaryFile(mode='w+t')
-    for s in L:
-        file.write(f'{s}\n')
-    file.seek(0)  # Go back to the beginning of the file
+    with tempfile.NamedTemporaryFile(
+            mode='w+t', suffix='txt', delete=False) as file:
+        for s in L:
+            file.write(f'{s}\n')
+        file.seek(0)  # Go back to the beginning of the file
 
-    encode, decode = data_utils.build_index(file.name)
+        encode, decode = data_utils.build_index(file.name)
 
-    assert encode['kw1'] == 0
-    assert encode['kw2'] == 1
-    assert encode['kw3'] == 2
-    assert decode[0] == 'kw1'
-    assert decode[1] == 'kw2'
-    assert decode[2] == 'kw3'
-
-    file.close()
+        assert encode['kw1'] == 0
+        assert encode['kw2'] == 1
+        assert encode['kw3'] == 2
+        assert decode[0] == 'kw1'
+        assert decode[1] == 'kw2'
+        assert decode[2] == 'kw3'
 
 
 @given(
