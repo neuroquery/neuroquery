@@ -62,7 +62,7 @@ def nltk_stop_words():
 
 
 def sklearn_stop_words():
-    return set(sklearn.feature_extraction.stop_words.ENGLISH_STOP_WORDS)
+    return set(sklearn.feature_extraction.text.ENGLISH_STOP_WORDS)
 
 
 class Tokenizer(object):
@@ -652,6 +652,8 @@ def unigram_operator(vocabulary):
 
 
 def add_unigram_frequencies(frequencies, unigram_op=None, voc=None):
+    if not sparse.issparse(frequencies):
+        frequencies = np.asarray(frequencies)
     if unigram_op is None:
         unigram_op = unigram_operator(voc)
     return safe_sparse_dot(frequencies, unigram_op)
