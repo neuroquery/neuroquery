@@ -4,6 +4,7 @@ Minimal example: encoding with NeuroQuery
 
 The model used here is the same as the one deployed on the neuroquery website
 ( https://neuroquery.saclay.inria.fr ).
+You can run this example on binder: https://mybinder.org/v2/gh/neuroquery/neuroquery.git/master?filepath=examples
 """
 ######################################################################
 # Encode a query into a statistical map of the brain

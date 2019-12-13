@@ -104,12 +104,20 @@ class RidgeGCV(LinearRegression):
             self.M_ = M
         return self
 
-    def z_energy(self, use_positive_part=True):
+    def z_energy(
+        self, use_positive_part=True, regularize_var=True, order=None
+    ):
         var = np.outer(self._var_filter, self._res_var)
-        z = self.coef_.T / np.sqrt(var + var.mean())
+        if regularize_var:
+            var += var.mean()
+        else:
+            var += 1e-24
+        z = self.coef_.T / np.sqrt(var)
         if use_positive_part:
             np.clip(z, 0, None, out=z)
-        return (z ** 2).mean(axis=1)
+        if order is None:
+            return (z ** 2).mean(axis=1)
+        return np.linalg.norm(z, axis=1, ord=order)
 
     def z_maps(self):
         var = np.outer(self._var_filter, self._res_var)
@@ -127,21 +135,39 @@ class RidgeGCV(LinearRegression):
         ) / np.maximum(np.sqrt(self.prediction_variance(X)), 1e-24)
 
 
-def _linreg_energy(X, Y, alphas, use_positive_part=True):
+def _linreg_energy(
+    X, Y, alphas, use_positive_part=True, regularize_var=True, order=None
+):
     ridge = RidgeGCV(alphas=alphas).fit(X, Y)
-    return ridge.z_energy(use_positive_part=use_positive_part)
+    return ridge.z_energy(
+        use_positive_part=use_positive_part,
+        regularize_var=regularize_var,
+        order=order,
+    )
 
 
 class AdaptiveRidge(RidgeGCV):
     def __init__(
-        self, alphas=_DEFAULT_ALPHAS, use_positive_part=True, store_M=False
+        self,
+        alphas=_DEFAULT_ALPHAS,
+        use_positive_part=True,
+        store_M=False,
+        regularize_var=True,
+        energy_order=None,
     ):
         super().__init__(alphas=alphas, store_M=store_M)
         self.use_positive_part = use_positive_part
+        self.regularize_var = regularize_var
+        self.energy_order = energy_order
 
     def _compute_feat_penalty(self, X, Y):
         z_energy = _linreg_energy(
-            X, Y, self.alphas, use_positive_part=self.use_positive_part
+            X,
+            Y,
+            self.alphas,
+            use_positive_part=self.use_positive_part,
+            regularize_var=self.regularize_var,
+            order=self.energy_order,
         )
         self.feat_penalty_ = 1 / np.maximum(
             z_energy - (z_energy.mean() + 2 * z_energy.std()), 0.001
@@ -151,15 +177,25 @@ class AdaptiveRidge(RidgeGCV):
 
 class SelectiveRidge(RidgeGCV):
     def __init__(
-        self, alphas=_DEFAULT_ALPHAS, use_positive_part=True, store_M=False
+        self,
+        alphas=_DEFAULT_ALPHAS,
+        use_positive_part=True,
+        store_M=False,
+        regularize_var=True,
+        energy_order=None,
     ):
         super().__init__(alphas=alphas, store_M=store_M)
         self.use_positive_part = use_positive_part
+        self.regularize_var = regularize_var
+        self.energy_order = energy_order
 
     def fit(self, X, Y):
         self.original_n_features_ = X.shape[1]
         adapt = AdaptiveRidge(
-            alphas=self.alphas, use_positive_part=self.use_positive_part
+            alphas=self.alphas,
+            use_positive_part=self.use_positive_part,
+            regularize_var=self.regularize_var,
+            energy_order=self.energy_order,
         ).fit(X, Y)
         self.selected_features_ = np.arange(X.shape[1])[
             adapt.feat_penalty_ < adapt.feat_penalty_.max()

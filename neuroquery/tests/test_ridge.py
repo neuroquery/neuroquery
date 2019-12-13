@@ -112,5 +112,13 @@ def test_predictions(regressor):
     sk_score = cross_val_score(sk_reg, x, y, cv=5)
     if regressor == ridge.RidgeGCV:
         assert np.allclose(score, sk_score)
-    else:
-        assert score.mean() > sk_score.mean()
+        return
+    assert score.mean() > sk_score.mean()
+    reg1 = regressor(
+        use_positive_part=False, regularize_var=False, energy_order=1
+    )
+    score = cross_val_score(reg1, x, y, cv=5)
+    assert score.mean() > sk_score.mean()
+    reg.fit(x, y)
+    reg1.fit(x, y)
+    assert (reg1.feat_penalty_ != reg.feat_penalty_).mean() > 0.5
