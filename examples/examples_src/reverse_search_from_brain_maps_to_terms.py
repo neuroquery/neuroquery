@@ -78,6 +78,8 @@ queries["DMN coordinates"] = dmn_img
 for name, query_map in queries.items():
     masked_query = encoder._get_masker().transform(query_map).ravel()
     similarities = np.abs(masked_query).dot(term_maps.T)
+    # rescale by document frequencies, optional
+    similarities *= np.log(1 + encoder.document_frequencies().values.ravel())
     top_20 = np.argsort(similarities)[::-1][:20]
     top_terms = voc[top_20].ravel()
 
