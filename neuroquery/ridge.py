@@ -258,8 +258,8 @@ class FittedLinearModel(RidgeGCV):
         return cls(
             model.coef_,
             model.intercept_,
-            model.M_,
-            model._res_var,
+            getattr(model, "M_", None),
+            getattr(model, "_res_var", None),
             getattr(model, "selected_features_", None),
             getattr(model, "original_n_features_", None),
         )
@@ -284,8 +284,8 @@ class FittedLinearModel(RidgeGCV):
         self,
         coef,
         intercept,
-        M,
-        residual_var,
+        M=None,
+        residual_var=None,
         selected_features=None,
         original_n_features=None,
     ):
@@ -310,7 +310,10 @@ class FittedLinearModel(RidgeGCV):
             self.original_n_features_ = self.coef_.shape[1]
         else:
             self.original_n_features_ = self.original_n_features
-        self._var_filter = np.einsum("ij,ij->i", self.M_, self.M_)
+        if self.M_ is not None:
+            self._var_filter = np.einsum("ij,ij->i", self.M_, self.M_)
+        else:
+            self._var_filter = None
         return self
 
     def predict(self, X):
@@ -321,6 +324,8 @@ class FittedLinearModel(RidgeGCV):
         )
 
     def z_maps(self, full=True):
+        if self._var_filter is None:
+            raise ValueError("this model cannot estimate coef variance")
         var = np.outer(self._var_filter, self._res_var)
         z = self.coef_.T / np.maximum(np.sqrt(var), 1e-24)
         if not full:
@@ -330,12 +335,16 @@ class FittedLinearModel(RidgeGCV):
         return full_z
 
     def prediction_variance(self, X):
+        if self._var_filter is None:
+            raise ValueError("this model cannot estimate coef variance")
         X = X[:, self.selected_features_]
         XM = np.atleast_2d(safe_sparse_dot(X, self.M_, dense_output=True))
         XMMtXt = (XM ** 2).sum(axis=1, keepdims=True)
         return XMMtXt * self._res_var
 
     def transform_to_z_maps(self, X):
+        if self._var_filter is None:
+            raise ValueError("this model cannot estimate coef variance")
         pred_variance = self.prediction_variance(X)
         X = X[:, self.selected_features_]
         return safe_sparse_dot(

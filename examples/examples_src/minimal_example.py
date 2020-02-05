@@ -17,7 +17,7 @@ encoder = NeuroQueryModel.from_data_dir(fetch_neuroquery_model())
 ######################################################################
 query = """Huntington's disease"""
 result = encoder(query)
-view_img(result["z_map"], threshold=3.1)
+view_img(result["brain_map"], threshold=3.1)
 
 ######################################################################
 # (drag the mouse on this interactive plot to see other slices)
@@ -25,7 +25,7 @@ view_img(result["z_map"], threshold=3.1)
 # Note: if you are not using a jupyter notebook, use `.open_in_browser()` to
 # open the plot above:
 
-view_img(result["z_map"], threshold=3.1).open_in_browser()
+view_img(result["brain_map"], threshold=3.1).open_in_browser()
 
 
 ######################################################################

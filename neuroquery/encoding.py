@@ -197,15 +197,16 @@ class NeuroQueryModel(object):
         raw_tfidf = self.vectorizer.transform(documents)
         raw_tfidf = normalize(raw_tfidf, copy=False)
         self.smoothed_regression.regression_.intercept_ = 0.0
-        z_scores = self.smoothed_regression.transform_to_z_maps(raw_tfidf)
+        brain_maps = self.smoothed_regression.transform_to_brain_maps(
+            raw_tfidf)
         masker = self._get_masker()
-        z_maps_unmasked = list(map(masker.inverse_transform, z_scores))
+        brain_maps_unmasked = list(map(masker.inverse_transform, brain_maps))
         smoothed_tfidf = self.smoothed_regression.smoothing_.transform(
             raw_tfidf
         )
         smoothed_tfidf = normalize(smoothed_tfidf, copy=False)
         return {
-            "z_map": z_maps_unmasked,
+            "brain_map": brain_maps_unmasked,
             "raw_tfidf": raw_tfidf,
             "smoothed_tfidf": smoothed_tfidf,
         }
