@@ -114,7 +114,7 @@ print('Encoding "{}"'.format(query))
 
 result = encoder(query)
 
-plotting.view_img(result["z_map"], threshold=3.0).open_in_browser()
+plotting.view_img(result["brain_map"], threshold=3.0).open_in_browser()
 
 print("Similar words:")
 print(result["similar_words"].head())
@@ -124,7 +124,7 @@ print(result["similar_documents"].head())
 print("\nmodel saved in {}".format(output_directory))
 
 # Display in notebook
-plotting.view_img(result["z_map"], threshold=3.0)
+plotting.view_img(result["brain_map"], threshold=3.0)
 
 ######################################################################
 # Now that the model is trained and saved, it can easily be loaded in a later

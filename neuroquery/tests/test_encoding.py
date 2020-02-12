@@ -3,11 +3,12 @@ import tempfile
 import numpy as np
 import pandas as pd
 from sklearn import datasets
+from nilearn import image
 from nibabel.nifti1 import Nifti1Image
 
 import pytest
 
-from neuroquery import encoding, smoothed_regression, tokenization
+from neuroquery import encoding, smoothed_regression, tokenization, ridge
 
 
 def _dataset_and_voc():
@@ -56,8 +57,8 @@ def test_neuroquery_model():
         encoder.to_data_dir(tmp_dir)
         loaded = encoding.NeuroQueryModel.from_data_dir(tmp_dir)
         assert not loaded.vectorizer.add_unigrams
-    encoded = loaded(text)["z_map"].get_data()
-    assert np.allclose(encoded, res["z_map"].get_data())
+    encoded = loaded(text)["brain_map"].get_data()
+    assert np.allclose(encoded, res["brain_map"].get_data())
 
     n_docs = 4
     tfidf = np.zeros((n_docs, x.shape[1]))
@@ -82,3 +83,19 @@ def test_neuroquery_model():
     for i in range(n_docs):
         res = encoder(encoder.full_vocabulary()[i])
         assert res["similar_documents"].id[0] == i
+
+
+def test_simple_encoder():
+    x, y, voc = _dataset_and_voc()
+    vect = tokenization.TextVectorizer.from_vocabulary(voc)
+    ridge_reg = ridge.RidgeGCV().fit(x, y)
+    reg = ridge.FittedLinearModel(ridge_reg.coef_, ridge_reg.intercept_)
+    encoder = encoding.SimpleEncoder(vect, reg, mask_img=_mask_img(y.shape[1]))
+    text = "feature0 and feature8"
+    res = encoder(text)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        encoder.to_data_dir(tmp_dir)
+        loaded = encoding.SimpleEncoder.from_data_dir(tmp_dir)
+    encoded = image.get_data(loaded(text)["brain_map"])
+    assert np.allclose(encoded, image.get_data(res["brain_map"]))
+    assert len(encoder.full_vocabulary()) == 91

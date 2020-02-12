@@ -26,7 +26,7 @@ def test_fetch_neuroquery_model():
             data_dir = datasets.fetch_neuroquery_model(tmp_dir)
             model = encoding.NeuroQueryModel.from_data_dir(data_dir)
             res = model("reading words")
-            assert "z_map" in res
+            assert "brain_map" in res
             data_dir = datasets.fetch_neuroquery_model(tmp_dir)
             mock_get.assert_called_once()
 

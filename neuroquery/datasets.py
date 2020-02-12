@@ -18,11 +18,11 @@ def get_neuroquery_data_dir(data_dir=None):
     return str(data_dir)
 
 
-def _download_neuroquery_model(out_dir):
+def _download_neuroquery_model(data_dir, model_name):
     print("Downloading NeuroQuery model...")
     resp = requests.get(
         "https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
-        "master/neuroquery_model.zip"
+        "master/{}.zip".format(model_name)
     )
     resp.raise_for_status()
     print("Downloaded.")
@@ -34,17 +34,18 @@ def _download_neuroquery_model(out_dir):
         with zipfile.ZipFile(zip_path) as zip_f:
             extract_dir = tmp_dir / "extract_dir"
             zip_f.extractall(str(extract_dir))
-        model_path = extract_dir / "neuroquery_model"
-        shutil.copytree(str(model_path), out_dir)
+        model_path = extract_dir / model_name
+        out_dir = pathlib.Path(data_dir) / model_name
+        shutil.copytree(str(model_path), str(out_dir))
     return out_dir
 
 
-def fetch_neuroquery_model(data_dir=None):
+def fetch_neuroquery_model(data_dir=None, model_name="neuroquery_model"):
     data_dir = pathlib.Path(get_neuroquery_data_dir(data_dir))
-    out_dir = data_dir / "neuroquery_model"
+    out_dir = data_dir / model_name
     if out_dir.is_dir():
         return str(out_dir)
-    _download_neuroquery_model(str(out_dir))
+    _download_neuroquery_model(str(data_dir), model_name)
     return str(out_dir)
 
 

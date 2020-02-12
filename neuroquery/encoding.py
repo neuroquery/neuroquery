@@ -189,7 +189,7 @@ class NeuroQueryModel:
         Returns
         -------
         list of dict, each containing:
-            - "z_map": a nifti image of the most relevant brain regions.
+            - "brain_map": a nifti image of the most relevant brain regions.
             - "raw_tfidf": the vectorized documents.
             - "smoothed_tfidf": the tfidf after semantic smoothing.
 
@@ -222,11 +222,11 @@ class NeuroQueryModel:
         Returns
         -------
         dict containing:
-            - "z_map": a nifti image of the most relevant brain regions.
+            - "brain_map": a nifti image of the most relevant brain regions.
             - "similar_words": pandas DataFrame containing related terms.
                 - "similarity" is how much the term is related.
                 - "weight_in_brain_map" is the contribution of the term in the
-                  predicted "z_map".
+                  predicted "brain_map".
                 - "weight_in_query" is the TFIDF of the term in `document`.
             - "similar_documents": if no corpus_info was provided, this is
               `None`. Otherwise it is a DataFrame containing information about
@@ -297,6 +297,16 @@ class SimpleEncoder:
         mask_img = image.load_img(str(model_dir / "mask_img.nii.gz"))
         return cls(vectorizer, regression, mask_img)
 
+    def to_data_dir(self, model_dir):
+        """Save the model so it can later be loaded with `from_data_dir`."""
+        model_dir = pathlib.Path(model_dir)
+        model_dir.mkdir(parents=True, exist_ok=True)
+        self.vectorizer.to_vocabulary_file(str(model_dir / "vocabulary.csv"))
+        self.regression.to_data_dir(model_dir)
+        self.get_masker().mask_img_.to_filename(
+            str(model_dir / "mask_img.nii.gz")
+        )
+
     def __init__(self, vectorizer, regression, mask_img):
         self.vectorizer = vectorizer
         self.regression = regression
@@ -317,3 +327,7 @@ class SimpleEncoder:
         result[
             "highlighted_text"] = self.vectorizer.tokenizer.highlighted_text()
         return result
+
+    def full_vocabulary(self):
+        """All the terms recognized by the model."""
+        return self.vectorizer.get_vocabulary()

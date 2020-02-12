@@ -122,3 +122,15 @@ def test_predictions(regressor):
     reg.fit(x, y)
     reg1.fit(x, y)
     assert (reg1.feat_penalty_ != reg.feat_penalty_).mean() > 0.5
+
+
+def test_fitted_linear_model_no_var():
+    reg = ridge.FittedLinearModel(np.ones((3, 7)), np.ones(3))
+    with pytest.raises(ValueError):
+        reg.z_maps()
+    with pytest.raises(ValueError):
+        reg.prediction_variance(np.ones((2, 7)))
+    with pytest.raises(ValueError):
+        reg.transform_to_z_maps(np.ones((2, 7)))
+    pred = reg.predict(np.zeros((2, 7)))
+    assert np.allclose(pred, np.ones((2, 3)))

@@ -49,7 +49,7 @@ encoder = NeuroQueryModel.from_data_dir(fetch_neuroquery_model())
 # encoder returns a dictionary containing a brain map and more,
 # see examples or documentation for details
 view_img(
-    encoder("Parkinson's disease")["z_map"], threshold=3.).open_in_browser()
+    encoder("Parkinson's disease")["brain_map"], threshold=3.).open_in_browser()
 ```
 
 `neuroquery` also provides classes to train new models from scientific

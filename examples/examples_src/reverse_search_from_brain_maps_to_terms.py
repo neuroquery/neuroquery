@@ -45,7 +45,7 @@ if maps_file.is_file():
 else:
     print("Computing brain maps for all terms in the vocabulary...")
     term_maps = encoder._get_masker().transform(
-        encoder.transform(voc[:, None])["z_map"])
+        encoder.transform(voc[:, None])["brain_map"])
     print("Done")
     np.save(str(maps_file), term_maps)
 

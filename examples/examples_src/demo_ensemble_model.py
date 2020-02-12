@@ -1,4 +1,5 @@
 from nilearn import plotting
+from neuroquery import fetch_neuroquery_model
 from neuroquery.encoding import SimpleEncoder
 
 encoder = SimpleEncoder.from_data_dir("/tmp/ensemble_model")
