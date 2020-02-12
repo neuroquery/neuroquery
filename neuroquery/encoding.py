@@ -8,12 +8,12 @@ from sklearn.utils.extmath import safe_sparse_dot
 from nilearn import image
 
 from neuroquery.img_utils import get_masker
-from neuroquery import tokenization, smoothed_regression
+from neuroquery import tokenization, smoothed_regression, ridge
 
 _MAX_SIMILAR_DOCS_RETURNED = 100
 
 
-class NeuroQueryModel(object):
+class NeuroQueryModel:
     """Text -> brain map encoder.
 
     It encodes text into statistical maps of the brain and also provides a list
@@ -90,7 +90,7 @@ class NeuroQueryModel(object):
         model_dir.mkdir(parents=True, exist_ok=True)
         self.vectorizer.to_vocabulary_file(str(model_dir / "vocabulary.csv"))
         self.smoothed_regression.to_data_dir(model_dir)
-        self._get_masker().mask_img_.to_filename(
+        self.get_masker().mask_img_.to_filename(
             str(model_dir / "mask_img.nii.gz")
         )
         if self.corpus_info is not None:
@@ -168,7 +168,7 @@ class NeuroQueryModel(object):
             self.smoothed_regression.regression_.coef_, axis=0
         )
 
-    def _get_masker(self):
+    def get_masker(self):
         if not hasattr(self, "masker_"):
             self.masker_ = get_masker(self.mask_img)
         return self.masker_
@@ -199,7 +199,7 @@ class NeuroQueryModel(object):
         self.smoothed_regression.regression_.intercept_ = 0.0
         brain_maps = self.smoothed_regression.transform_to_brain_maps(
             raw_tfidf)
-        masker = self._get_masker()
+        masker = self.get_masker()
         brain_maps_unmasked = list(map(masker.inverse_transform, brain_maps))
         smoothed_tfidf = self.smoothed_regression.smoothing_.transform(
             raw_tfidf
@@ -281,4 +281,39 @@ class NeuroQueryModel(object):
                 )
             }
         )
+        return result
+
+
+class SimpleEncoder:
+    @classmethod
+    def from_data_dir(cls, model_dir):
+        model_dir = pathlib.Path(model_dir)
+        vectorizer = tokenization.TextVectorizer.from_vocabulary_file(
+            str(model_dir / "vocabulary.csv"),
+            voc_mapping="auto",
+            add_unigrams=False,
+        )
+        regression = ridge.FittedLinearModel.from_data_dir(model_dir)
+        mask_img = image.load_img(str(model_dir / "mask_img.nii.gz"))
+        return cls(vectorizer, regression, mask_img)
+
+    def __init__(self, vectorizer, regression, mask_img):
+        self.vectorizer = vectorizer
+        self.regression = regression
+        self.mask_img = mask_img
+
+    def get_masker(self):
+        if not hasattr(self, "masker_"):
+            self.masker_ = get_masker(self.mask_img)
+        return self.masker_
+
+    def __call__(self, document):
+        self.vectorizer.tokenizer.keep_pos = True
+        self.regression.intercept_ = 0.0
+        result = {}
+        tfidf = self.vectorizer.transform([document])
+        masked_map = self.regression.predict(tfidf).squeeze()
+        result["brain_map"] = self.get_masker().inverse_transform(masked_map)
+        result[
+            "highlighted_text"] = self.vectorizer.tokenizer.highlighted_text()
         return result
