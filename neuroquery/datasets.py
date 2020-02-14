@@ -7,6 +7,16 @@ import shutil
 import requests
 
 
+_MODEL_URLS = {
+    "ensemble_model_2020-02-12": "https://osf.io/gj7ek/download",
+    "neuroquery_model": "https://osf.io/598tj/download"
+}
+
+
+def get_available_model_names():
+    return list(_MODEL_URLS.keys())
+
+
 def get_neuroquery_data_dir(data_dir=None):
     if data_dir is None:
         data_dir = (
@@ -19,11 +29,12 @@ def get_neuroquery_data_dir(data_dir=None):
 
 
 def _download_neuroquery_model(data_dir, model_name):
+    if model_name not in _MODEL_URLS:
+        raise ValueError(
+            "You asked to download the model: '{}' but it does not exist,"
+            " available models are: {}".format(model_name, _MODEL_URLS.keys()))
     print("Downloading NeuroQuery model...")
-    resp = requests.get(
-        "https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
-        "master/{}.zip".format(model_name)
-    )
+    resp = requests.get(_MODEL_URLS[model_name])
     resp.raise_for_status()
     print("Downloaded.")
     with tempfile.TemporaryDirectory() as tmp_dir:
