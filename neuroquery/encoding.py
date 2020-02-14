@@ -285,6 +285,8 @@ class NeuroQueryModel:
 
 
 class SimpleEncoder:
+    """Basic text to brain map encoder"""
+
     @classmethod
     def from_data_dir(cls, model_dir):
         model_dir = pathlib.Path(model_dir)
