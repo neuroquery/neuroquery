@@ -192,6 +192,7 @@ class NeuroQueryModel:
             - "brain_map": a nifti image of the most relevant brain regions.
             - "raw_tfidf": the vectorized documents.
             - "smoothed_tfidf": the tfidf after semantic smoothing.
+            - "z_map" is an alias for "brain_map" for backwards compatibility
 
         """
         raw_tfidf = self.vectorizer.transform(documents)
@@ -207,6 +208,7 @@ class NeuroQueryModel:
         smoothed_tfidf = normalize(smoothed_tfidf, copy=False)
         return {
             "brain_map": brain_maps_unmasked,
+            "z_map": brain_maps_unmasked,
             "raw_tfidf": raw_tfidf,
             "smoothed_tfidf": smoothed_tfidf,
         }
@@ -235,6 +237,7 @@ class NeuroQueryModel:
               recognized in the provided text.
             - "smoothed_tfidf": the tfidf after semantic smoothing.
             - "raw_tfidf": the vectorized documents.
+            - "z_map" is an alias for "brain_map" for backwards compatibility
         """
         self.vectorizer.tokenizer.keep_pos = True
         result = self.transform([document])
