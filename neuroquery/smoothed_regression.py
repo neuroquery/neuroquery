@@ -40,10 +40,12 @@ class SmoothedRegression(BaseEstimator, RegressorMixin):
         alphas=ridge._DEFAULT_ALPHAS,
         n_components=300,
         smoothing_weight=0.1,
+        transform_to_z=True,
     ):
         self.alphas = alphas
         self.n_components = n_components
         self.smoothing_weight = smoothing_weight
+        self.transform_to_z = transform_to_z
 
     def fit(self, X, Y):
         if sparse.issparse(X):
@@ -64,3 +66,11 @@ class SmoothedRegression(BaseEstimator, RegressorMixin):
     def transform_to_z_maps(self, X):
         X = self.smoothing_.transform(X)
         return self.regression_.transform_to_z_maps(X)
+
+    def transform_to_brain_maps(self, X):
+        if not self.transform_to_z:
+            return self.predict(X)
+        try:
+            return self.transform_to_z_maps(X)
+        except Exception:
+            return self.predict(X)

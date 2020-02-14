@@ -437,6 +437,15 @@ def print_highlighted_text(text, replace=False):
     print(get_printable_highlighted_text(text, replace=replace))
 
 
+def get_html_highlighted_text(text, standalone=False):
+    stylesheet_path = pathlib.Path(__file__).parent / "data" / "highlight.xsl"
+    stylesheet = etree.XSLT(etree.parse(str(stylesheet_path)))
+    html = stylesheet(etree.XML(text, parser=etree.XMLParser(recover=True)))
+    if not standalone:
+        html = html.findall("body")[0][0]
+    return etree.tostring(html, method="html", encoding="unicode")
+
+
 def load_vocabulary(vocabulary_file, token_pattern=WORD_PATTERN):
     tokenizer = Tokenizer(token_pattern=token_pattern)
     if vocabulary_file.endswith(".csv"):

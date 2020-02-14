@@ -47,15 +47,15 @@ print(response.keys())
 
 
 ######################################################################
-# The "z_map" entry of the results is a brain map showing the anatomical
+# The "brain_map" entry of the results is a brain map showing the anatomical
 # regions that are most strongly associated with the query in the neuroimaging
 # literature. It is a `Nifti1Image` which can be saved, displayed, etc.
 
 from nilearn import plotting
 
-print(type(response["z_map"]))
+print(type(response["brain_map"]))
 plotting.plot_stat_map(
-    response["z_map"], display_mode="z", title="aphasia", threshold=3.1
+    response["brain_map"], display_mode="z", title="aphasia", threshold=3.1
 )
 
 
@@ -63,7 +63,7 @@ plotting.plot_stat_map(
 #
 
 # Display the map on the cortical surface:
-view = plotting.view_img_on_surf(response["z_map"], threshold=3.1)
+view = plotting.view_img_on_surf(response["brain_map"], threshold=3.1)
 view.open_in_browser()
 # (in a Jupyter notebook, we can display an inline view):
 view
@@ -72,7 +72,7 @@ view
 #
 
 # Or open interactive viewer:
-view = plotting.view_img(response["z_map"], threshold=3.1)
+view = plotting.view_img(response["brain_map"], threshold=3.1)
 view.open_in_browser()
 # (in a Jupyter notebook, we can display an inline view):
 view

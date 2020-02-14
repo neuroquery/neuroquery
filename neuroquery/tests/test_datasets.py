@@ -1,6 +1,7 @@
 import tempfile
 import pathlib
 from unittest import mock
+import pytest
 
 from neuroquery import encoding
 from neuroquery import datasets
@@ -26,9 +27,11 @@ def test_fetch_neuroquery_model():
             data_dir = datasets.fetch_neuroquery_model(tmp_dir)
             model = encoding.NeuroQueryModel.from_data_dir(data_dir)
             res = model("reading words")
-            assert "z_map" in res
+            assert "brain_map" in res
             data_dir = datasets.fetch_neuroquery_model(tmp_dir)
             mock_get.assert_called_once()
+    with pytest.raises(ValueError):
+        datasets.fetch_neuroquery_model(model_name="bad_model")
 
 
 def test_get_neuroquery_data_dir():
@@ -53,3 +56,8 @@ def test_fetch_peak_coordinates():
                 assert f.read() == "peak_coordinates_test"
             coord_file = datasets.fetch_peak_coordinates(tmp_dir)
             mock_get.assert_called_once()
+
+
+def test_get_available_model_names():
+    names = datasets.get_available_model_names()
+    assert names == list(datasets._MODEL_URLS.keys())

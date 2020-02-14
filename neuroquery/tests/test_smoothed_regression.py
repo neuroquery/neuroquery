@@ -46,3 +46,8 @@ def test_z_maps():
         assert np.allclose(
             loaded.transform_to_z_maps(X), reg.transform_to_z_maps(X)
         )
+    reg.transform_to_z = False
+    assert np.allclose(reg.transform_to_brain_maps(X), reg.predict(X))
+    reg.transform_to_z = True
+    reg.regression_.M_ = None
+    assert np.allclose(reg.transform_to_brain_maps(X), reg.predict(X))

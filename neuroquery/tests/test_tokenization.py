@@ -289,6 +289,12 @@ def test_highlight_text():
         "The \x1b[92m[one]\x1b[0m twenty plus "
         "\x1b[92m[twenty three]\x1b[0m numbers"
     )
+    html = tokenization.get_html_highlighted_text(tok.highlighted_text())
+    assert html == (
+        '<span>The <span style="background-color: LightBlue;">'
+        'One</span> twenty plus <span style="background-color: '
+        'LightBlue;">TWENTY-three</span> numbers</span>'
+    )
     tok.print_highlighted_text()
     tokens = tok(".+ --", keep_pos=True)
     assert tokens == []
@@ -296,6 +302,15 @@ def test_highlight_text():
     parts = highlighted.xpath("child::node()")
     assert len(parts) == 1
     assert parts[0] == ".+ --"
+    html = tokenization.get_html_highlighted_text(
+        tok.highlighted_text(), standalone=True
+    )
+    assert html == (
+        '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional'
+        '//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">\n'
+        '<html><head><meta charset="UTF-8"><title>highlighted '
+        "text</title></head><body><span>.+ --</span></body></html>"
+    )
 
 
 def test_make_voc_mapping():
