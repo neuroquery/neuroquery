@@ -11,13 +11,15 @@
         <title>highlighted text</title>
       </head>
       <body>
-        <xsl:apply-templates/>
+        <span>
+          <xsl:apply-templates/>
+        </span>
       </body>
     </html>
   </xsl:template>
 
   <xsl:template match="extracted_phrase">
-    <span style="color: blue;">[ <xsl:apply-templates /> ]</span>
+    <span style="background-color: LightBlue;"><xsl:apply-templates /></span>
   </xsl:template>
 
 </xsl:transform>
