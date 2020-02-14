@@ -8,4 +8,5 @@ encoder = SimpleEncoder.from_data_dir(model_dir)
 query = "theory of mind"
 result = encoder(query)
 plotting.view_img(
-    result["brain_map"], title=query, threshold="97%").open_in_browser()
+    result["brain_map"], title=query, threshold="97%", colormap=False
+).open_in_browser()

@@ -199,7 +199,8 @@ class NeuroQueryModel:
         raw_tfidf = normalize(raw_tfidf, copy=False)
         self.smoothed_regression.regression_.intercept_ = 0.0
         brain_maps = self.smoothed_regression.transform_to_brain_maps(
-            raw_tfidf)
+            raw_tfidf
+        )
         masker = self.get_masker()
         brain_maps_unmasked = list(map(masker.inverse_transform, brain_maps))
         smoothed_tfidf = self.smoothed_regression.smoothing_.transform(
@@ -330,7 +331,8 @@ class SimpleEncoder:
         masked_map = self.regression.predict(tfidf).squeeze()
         result["brain_map"] = self.get_masker().inverse_transform(masked_map)
         result[
-            "highlighted_text"] = self.vectorizer.tokenizer.highlighted_text()
+            "highlighted_text"
+        ] = self.vectorizer.tokenizer.highlighted_text()
         return result
 
     def full_vocabulary(self):

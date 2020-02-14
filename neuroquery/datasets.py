@@ -9,7 +9,7 @@ import requests
 
 _MODEL_URLS = {
     "ensemble_model_2020-02-12": "https://osf.io/gj7ek/download",
-    "neuroquery_model": "https://osf.io/598tj/download"
+    "neuroquery_model": "https://osf.io/598tj/download",
 }
 
 
@@ -32,7 +32,8 @@ def _download_neuroquery_model(data_dir, model_name):
     if model_name not in _MODEL_URLS:
         raise ValueError(
             "You asked to download the model: '{}' but it does not exist,"
-            " available models are: {}".format(model_name, _MODEL_URLS.keys()))
+            " available models are: {}".format(model_name, _MODEL_URLS.keys())
+        )
     print("Downloading NeuroQuery model...")
     resp = requests.get(_MODEL_URLS[model_name])
     resp.raise_for_status()

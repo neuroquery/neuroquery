@@ -40,7 +40,7 @@ class SmoothedRegression(BaseEstimator, RegressorMixin):
         alphas=ridge._DEFAULT_ALPHAS,
         n_components=300,
         smoothing_weight=0.1,
-        transform_to_z=True
+        transform_to_z=True,
     ):
         self.alphas = alphas
         self.n_components = n_components

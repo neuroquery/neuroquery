@@ -45,7 +45,8 @@ if maps_file.is_file():
 else:
     print("Computing brain maps for all terms in the vocabulary...")
     term_maps = encoder._get_masker().transform(
-        encoder.transform(voc[:, None])["brain_map"])
+        encoder.transform(voc[:, None])["brain_map"]
+    )
     print("Done")
     np.save(str(maps_file), term_maps)
 
@@ -61,7 +62,8 @@ contrasts = ["left vs right button press", "sentence listening"]
 
 for contrast in contrasts:
     query_map = fetch_localizer_contrasts(
-        [contrast], n_subjects=1, get_tmaps=True)["tmaps"][0]
+        [contrast], n_subjects=1, get_tmaps=True
+    )["tmaps"][0]
     queries[contrast] = query_map
 
 dmn_coords = [(0, -52, 18), (-46, -68, 32), (46, -68, 32), (1, 50, -5)]
@@ -84,12 +86,13 @@ for name, query_map in queries.items():
     top_terms = voc[top_20].ravel()
 
     fig, (map_ax, text_ax) = plt.subplots(
-        2, 1, gridspec_kw={"height_ratios": [1., .5]})
+        2, 1, gridspec_kw={"height_ratios": [1.0, 0.5]}
+    )
     text = ", ".join(list(top_terms))
     plotting.plot_stat_map(query_map, axes=map_ax, threshold="auto")
     fig.suptitle("Query map: {}".format(name))
     text_ax.set_title("terms with similar maps:")
-    text_ax.text(0, .9, text, va="top", ha="left", wrap=True, fontsize=12)
+    text_ax.text(0, 0.9, text, va="top", ha="left", wrap=True, fontsize=12)
     text_ax.set_axis_off()
 
 plt.show()
@@ -134,7 +137,9 @@ for name, query_map in queries.items():
     pmids = brain_maps.index.values[top_studies]
     pmids = [pmid for pmid in pmids if pmid in corpus_metadata.index]
     top_studies_info = corpus_metadata.loc[pmids, ["title"]]
-    print("\n\nMost similar studies to the brain map"
-          " for {}:\n{:=<80}".format(name, ""))
+    print(
+        "\n\nMost similar studies to the brain map"
+        " for {}:\n{:=<80}".format(name, "")
+    )
     for pmid, title in top_studies_info.reset_index().values:
         print(pmid, title)
