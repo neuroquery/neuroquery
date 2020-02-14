@@ -44,7 +44,7 @@ if maps_file.is_file():
     term_maps = np.load(str(maps_file))
 else:
     print("Computing brain maps for all terms in the vocabulary...")
-    term_maps = encoder._get_masker().transform(
+    term_maps = encoder.get_masker().transform(
         encoder.transform(voc[:, None])["brain_map"]
     )
     print("Done")
@@ -67,8 +67,8 @@ for contrast in contrasts:
     queries[contrast] = query_map
 
 dmn_coords = [(0, -52, 18), (-46, -68, 32), (46, -68, 32), (1, 50, -5)]
-dmn_img = gaussian_coord_smoothing(dmn_coords, encoder._get_masker())
-masked_dmn = encoder._get_masker().transform(dmn_img).ravel()
+dmn_img = gaussian_coord_smoothing(dmn_coords, encoder.get_masker())
+masked_dmn = encoder.get_masker().transform(dmn_img).ravel()
 queries["DMN coordinates"] = dmn_img
 
 ######################################################################
@@ -78,7 +78,7 @@ queries["DMN coordinates"] = dmn_img
 
 
 for name, query_map in queries.items():
-    masked_query = encoder._get_masker().transform(query_map).ravel()
+    masked_query = encoder.get_masker().transform(query_map).ravel()
     similarities = np.abs(masked_query).dot(term_maps.T)
     # rescale by document frequencies, optional
     similarities *= np.log(1 + encoder.document_frequencies().values.ravel())
