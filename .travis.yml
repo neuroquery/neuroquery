@@ -1,8 +1,7 @@
 language: python
 env:
   global:
-    - CONDA_DEPENDENCIES='nilearn sklearn pandas regex nltk numpy scipy lxml python-Levenshtein pytest-cov codecov'
-    - PIP_DEPENDENCIES='requests'
+    - PIP_DEPENDENCIES='nilearn sklearn pandas regex nltk numpy scipy lxml python-Levenshtein pytest-cov codecov requests'
 python:
   - 3.6
 install:
