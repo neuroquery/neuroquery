@@ -34,7 +34,7 @@ def _download_neuroquery_model(data_dir, model_name):
             "You asked to download the model: '{}' but it does not exist,"
             " available models are: {}".format(model_name, _MODEL_URLS.keys())
         )
-    print("Downloading NeuroQuery model...")
+    print("Downloading NeuroQuery model: {}".format(model_name))
     resp = requests.get(_MODEL_URLS[model_name])
     resp.raise_for_status()
     print("Downloaded.")
@@ -66,7 +66,7 @@ def fetch_peak_coordinates(data_dir=None):
     out_file = data_dir / "coordinates.csv"
     if out_file.is_file():
         return str(out_file)
-    print("Downloading coordinates ...")
+    print("Downloading coordinates")
     resp = requests.get(
         "https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
         "master/training_data/coordinates.csv"
