@@ -3,7 +3,7 @@ Minimal example: encoding with NeuroQuery
 =========================================
 
 The model used here is the same as the one deployed on the neuroquery website
-( https://neuroquery.saclay.inria.fr ).
+( https://neuroquery.org ).
 You can run this example on binder: https://mybinder.org/v2/gh/neuroquery/neuroquery.git/master?filepath=examples
 """
 ######################################################################

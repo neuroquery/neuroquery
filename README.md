@@ -10,7 +10,9 @@ neuroimaging literature.
 Given a text query, it can produce a brain map of the most relevant anatomical
 structures according to the current scientific literature.
 
-It can be used through a web interface: https://neuroquery.saclay.inria.fr
+It can be used through a web interface: https://neuroquery.org
+
+Technical details and extensive validation are provided in [this paper](https://hal.archives-ouvertes.fr/hal-02485642v1/document).
 
 This Python package permits using NeuroQuery offline or integrating it in other
 applications. 

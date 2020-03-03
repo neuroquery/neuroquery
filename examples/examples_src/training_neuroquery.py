@@ -60,7 +60,7 @@ coordinates = pd.read_csv(datasets.fetch_peak_coordinates())
 coord_to_maps = Memory(cache_directory).cache(coordinates_to_maps)
 
 # You can set target_affine to a different value to increase image resolution
-# or reduce computation time. The model on neuroquery.saclay.inria.fr uses 4 mm
+# or reduce computation time. The model on neuroquery.org uses 4 mm
 # resolution i.e. target_affine=(4, 4, 4)
 # You can also adjust the smoothing by setting `fwhm` (Full Width at Half
 # maximum)
