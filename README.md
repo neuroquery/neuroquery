@@ -12,7 +12,7 @@ structures according to the current scientific literature.
 
 It can be used through a web interface: https://neuroquery.org
 
-Technical details and extensive validation are provided in [this paper](https://hal.archives-ouvertes.fr/hal-02485642v1/document).
+Technical details and extensive validation are provided in [this paper](https://elifesciences.org/articles/53385).
 
 This Python package permits using NeuroQuery offline or integrating it in other
 applications. 
