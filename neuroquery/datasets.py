@@ -18,14 +18,18 @@ def get_available_model_names():
 
 
 def get_neuroquery_data_dir(data_dir=None):
-    if data_dir is None:
-        data_dir = (
-            pathlib.Path(os.environ.get("HOME", ".")) / "neuroquery_data"
-        )
+    if data_dir is not None:
+        chosen_data_dir = pathlib.Path(data_dir)
     else:
-        data_dir = pathlib.Path(data_dir)
-    data_dir.mkdir(exist_ok=True)
-    return str(data_dir)
+        env_data_dir = os.environ.get("NEUROQUERY_DATA_DIR", None)
+        if env_data_dir is not None:
+            chosen_data_dir = pathlib.Path(env_data_dir)
+        else:
+            chosen_data_dir = (
+                pathlib.Path(os.environ.get("HOME", ".")) / "neuroquery_data"
+            )
+    chosen_data_dir.mkdir(exist_ok=True)
+    return str(chosen_data_dir)
 
 
 def _download_neuroquery_model(data_dir, model_name):

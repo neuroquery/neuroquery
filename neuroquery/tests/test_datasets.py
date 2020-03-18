@@ -40,9 +40,16 @@ def test_get_neuroquery_data_dir():
         nq_dir = datasets.get_neuroquery_data_dir(target_dir)
         assert nq_dir == target_dir
         assert pathlib.Path(nq_dir).is_dir()
-        with mock.patch("os.environ.get", return_value=tmp_dir):
+        env = {"HOME": tmp_dir}
+        with mock.patch("os.environ", env):
             nq_dir = datasets.get_neuroquery_data_dir()
             assert nq_dir == str(pathlib.Path(tmp_dir) / "neuroquery_data")
+            assert pathlib.Path(nq_dir).is_dir()
+        env_data_dir = str(pathlib.Path(tmp_dir) / "env_data_dir")
+        env = {"HOME": tmp_dir, "NEUROQUERY_DATA_DIR": env_data_dir}
+        with mock.patch("os.environ", env):
+            nq_dir = datasets.get_neuroquery_data_dir()
+            assert nq_dir == env_data_dir
             assert pathlib.Path(nq_dir).is_dir()
 
 
