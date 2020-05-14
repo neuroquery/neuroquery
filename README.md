@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/neuroquery/neuroquery/_apis/build/status/neuroquery.neuroquery?branchName=master)](https://dev.azure.com/neuroquery/neuroquery/_build/latest?definitionId=1&branchName=master) [![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/master/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery) [![Build status](https://ci.appveyor.com/api/projects/status/dk6yr0wl126hvty9?svg=true)](https://ci.appveyor.com/project/jeromedockes/neuroquery)
+[![Build Status](https://dev.azure.com/neuroquery/neuroquery/_apis/build/status/neuroquery.neuroquery?branchName=master)](https://dev.azure.com/neuroquery/neuroquery/_build/latest?definitionId=1&branchName=master) [![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/master/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery) 
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/neuroquery/neuroquery.git/master?filepath=examples)
 
