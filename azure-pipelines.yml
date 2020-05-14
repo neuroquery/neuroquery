@@ -25,7 +25,7 @@ jobs:
   - script: |
       pip install .
       python -m pytest --pyargs neuroquery --cov-report=xml --cov=neuroquery --cov-append -o junit_family=xunit2 --junitxml=test-results.xml
-      displayName: 'test'
+    displayName: 'test'
 
   - script: |
       codecov -f coverage.xml -t %CODECOV_TOKEN%
@@ -64,7 +64,7 @@ jobs:
   - script: |
       pip install .
       python -m pytest --pyargs neuroquery --cov-report=xml --cov=neuroquery --cov-append -o junit_family=xunit2 --junitxml=test-results.xml
-      displayName: 'test'
+    displayName: 'test'
 
   - script: |
       codecov -f coverage.xml -t ${CODECOV_TOKEN}

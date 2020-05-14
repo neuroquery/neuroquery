@@ -31,7 +31,7 @@ setup(
         "sklearn",
         "pandas",
         "regex",
-        "nltk(!=3.2.1)",
+        "nltk>=3.4.5",
         "numpy",
         "scipy",
         "lxml",
