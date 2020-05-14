@@ -1,0 +1,81 @@
+trigger:
+- master
+
+jobs:
+- job: 'run_tests_on_windows'
+  pool:
+    vmImage: 'windows-latest'
+  strategy:
+    matrix:
+      Python37
+        python.version: '3.7'
+
+  steps:
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install --prefer-binary -r requirements.txt
+      pip install pytest pytest-cov
+      pip install pytest-azurepipelines codecov
+    displayName: 'Install dependencies'
+
+  - script: |
+      pip install .
+      python -m pytest --pyargs neuroquery --cov-report=xml --cov=neuroquery --cov-append -o junit_family=xunit2 --junitxml=test-results.xml
+      displayName: 'test'
+
+  - script: |
+      codecov -f coverage.xml -t %CODECOV_TOKEN%
+    displayName: 'codecov'
+    env:
+      CODECOV_TOKEN: $(CODECOV_TOKEN)
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFiles: '**/test-results.xml'
+      testRunTitle: 'Python $(python.version)'
+    condition: succeededOrFailed()
+
+- job: 'run_tests_on_ubuntu'
+  pool:
+    vmImage: 'ubuntu-latest'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python38
+        python.version: '3.8'
+
+  steps:
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install --prefer-binary -r requirements.txt
+      pip install pytest pytest-cov
+      pip install pytest-azurepipelines codecov
+    displayName: 'Install dependencies'
+
+  - script: |
+      pip install .
+      python -m pytest --pyargs neuroquery --cov-report=xml --cov=neuroquery --cov-append -o junit_family=xunit2 --junitxml=test-results.xml
+      displayName: 'test'
+
+  - script: |
+      codecov -f coverage.xml -t ${CODECOV_TOKEN}
+    displayName: 'codecov'
+    env:
+      CODECOV_TOKEN: $(CODECOV_TOKEN)
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFiles: '**/test-results.xml'
+      testRunTitle: 'Python $(python.version)'
+    condition: succeededOrFailed()
