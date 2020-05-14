@@ -1,0 +1,14 @@
+pytest
+pytest-cov
+coverage
+nilearn
+sklearn
+pandas
+regex
+nltk != 3.2.1
+numpy
+scipy
+lxml
+requests
+matplotlib
+python-Levenshtein

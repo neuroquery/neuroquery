@@ -25,6 +25,7 @@ applications.
 
 NeuroQuery requires Python 3, numpy, scipy, scikit-learn, nilearn, pandas,
 regex, nltk, lxml, and requests.
+python-Levenshtein is an optional dependency used in some parts of tokenization
 
 ### Installation
 
