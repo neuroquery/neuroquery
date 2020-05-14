@@ -31,7 +31,7 @@ regex, nltk, lxml, and requests.
 `neuroquery` can be installed with
 
 ```
-pip install -U git+https://github.com/neuroquery/neuroquery.git
+pip install neuroquery
 ```
 
 ### Usage
