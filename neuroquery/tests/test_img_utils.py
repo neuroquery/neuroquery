@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from nilearn.input_data import NiftiSpheresMasker
+from nilearn.image import get_data
 
 import pytest
 
@@ -47,7 +48,7 @@ def test_gaussian_coord_smoothing():
     computed_img = img_utils.gaussian_coord_smoothing(coords)
     masker = NiftiSpheresMasker(coords + [(-10.0, 10.0, -30)]).fit()
     values = masker.transform(computed_img)[0]
-    assert (values[:2] > computed_img.get_data().max() / 2.0).all()
+    assert (values[:2] > get_data(computed_img).max() / 2.0).all()
     assert values[-1] == pytest.approx(0.0)
 
 

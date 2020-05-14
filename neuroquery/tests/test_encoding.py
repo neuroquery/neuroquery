@@ -57,8 +57,8 @@ def test_neuroquery_model():
         encoder.to_data_dir(tmp_dir)
         loaded = encoding.NeuroQueryModel.from_data_dir(tmp_dir)
         assert not loaded.vectorizer.add_unigrams
-    encoded = loaded(text)["brain_map"].get_data()
-    assert np.allclose(encoded, res["brain_map"].get_data())
+    encoded = image.get_data(loaded(text)["brain_map"])
+    assert np.allclose(encoded, image.get_data(res["brain_map"]))
     assert res["z_map"] is res["brain_map"]
 
     n_docs = 4
