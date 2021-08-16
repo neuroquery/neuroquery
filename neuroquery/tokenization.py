@@ -222,7 +222,7 @@ def _extract_phrases(phrase_map, sentence, out_of_voc):
 
 class PhraseExtractor(object):
     def __init__(self, phrases, out_of_voc="ignore"):
-        self.phrases_ = phrases
+        self.phrases_ = set(phrases)
         self.out_of_voc_ = out_of_voc
         self._phrase_map = _build_phrase_map(phrases)
         self.phrase_positions = None
@@ -497,7 +497,6 @@ def tokenizing_pipeline_from_vocabulary(
     token_pattern=WORD_PATTERN,
     as_tuples=False,
 ):
-    vocabulary = string_sequence_to_tuples(vocabulary)
     if frequencies is None:
         frequencies = np.ones(len(vocabulary))
     tokenizer = Tokenizer(token_pattern)
@@ -511,6 +510,7 @@ def tokenizing_pipeline_from_vocabulary(
     )
     phrases = {tuple(std(phrase)) for phrase in vocabulary}
     phrase_extractor = PhraseExtractor(phrases, out_of_voc=out_of_voc)
+    vocabulary = string_sequence_to_tuples(vocabulary)
     if voc_mapping == "auto":
         voc_mapping = make_vocabulary_mapping(
             vocabulary, frequencies, stemming=stemming
