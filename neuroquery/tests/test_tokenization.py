@@ -226,6 +226,21 @@ def test_tokenizing_pipeline(voc_mapping, with_frequencies):
         assert loaded.get_vocabulary() == tok.get_vocabulary()
 
 
+@pytest.mark.parametrize("use_freq", [True, False])
+def test_tokenizing_pipeline_from_bad_vocabulary(use_freq):
+    freq = None
+    voc = ["", "big ben", "London", ",+", "a ; M", "one ... three", ". of"]
+    if use_freq:
+        freq = np.arange(len(voc))
+    tok = tokenization.tokenizing_pipeline_from_vocabulary(
+        voc, frequencies=freq)
+    assert tok.get_full_vocabulary() == ["big ben", "london", "one three"]
+    if freq is None:
+        assert np.allclose(tok.get_frequencies(), 1.)
+    else:
+        assert np.allclose(tok.get_frequencies(), [1, 2, 5])
+
+
 def test_get_standardizing_inverse():
     std_inv = tokenization.get_standardizing_inverse(
         VOCABULARY_FILE,

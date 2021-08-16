@@ -377,7 +377,7 @@ class TokenizingPipeline(object):
         if self.frequencies is None:
             return np.ones(len(self.get_vocabulary()))
         idx = tuple_sequence_to_strings(
-            [self(w)[0] for w in self.frequencies.index]
+            [(self(w) or [""])[0] for w in self.frequencies.index]
         )
         freq = self.frequencies.groupby(idx).sum()
         self.frequencies_ = freq.loc[self.get_vocabulary()].values
@@ -508,7 +508,7 @@ def tokenizing_pipeline_from_vocabulary(
         standardizer=standardizer,
         tokenizer=tokenizer,
     )
-    phrases = {tuple(std(phrase)) for phrase in vocabulary}
+    phrases = {tuple(std(phrase)) for phrase in vocabulary}.difference({()})
     phrase_extractor = PhraseExtractor(phrases, out_of_voc=out_of_voc)
     vocabulary = string_sequence_to_tuples(vocabulary)
     if voc_mapping == "auto":
