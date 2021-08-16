@@ -11,7 +11,9 @@ from neuroquery import img_utils
 
 def test_get_masker():
     masker = img_utils.get_masker()
-    assert np.allclose(np.diag(masker.mask_img_.affine)[:3], [-2.0, 2.0, 2.0])
+    assert np.allclose(
+        np.abs(np.diag(masker.mask_img_.affine)[:3]), [2.0, 2.0, 2.0]
+    )
     new_masker = img_utils.get_masker(mask_img=masker)
     assert new_masker is masker
     new_masker = img_utils.get_masker(masker.mask_img_)
@@ -62,7 +64,8 @@ def test_coordinates_to_maps():
         }
     )
     maps, masker = img_utils.coordinates_to_maps(coords)
-    assert maps.shape == (3, 28542)
+    # nilearn mni mask changed
+    assert maps.shape == (3, 28542) or maps.shape == (3, 29398)
     coords_17 = [(0.0, 0.0, 0.0), (10.0, -10.0, 30.0)]
     img_17 = img_utils.gaussian_coord_smoothing(coords_17, target_affine=4.0)
     assert np.allclose(

@@ -390,3 +390,15 @@ def test_text_vectorizer():
     assert np.allclose(transformed.A[2, :4], [0.5, 0.5, 0.0, 0.0])
     assert vect.get_feature_names() == vect.tokenizer.get_vocabulary()
     assert vect.get_full_vocabulary() == vect.tokenizer.get_full_vocabulary()
+
+
+def test_text_vectorizer_non_whitespace_pattern():
+    voc = ["z >", "one two"]
+    pattern = r"\S+"
+    vectorizer = tokenization.TextVectorizer.from_vocabulary(
+        voc, token_pattern=pattern, use_idf=False, norm=None
+    )
+    text = ["something z > 10 z  >= z >  and one two"]
+    transformed = vectorizer.transform(text).A.ravel()
+    assert vectorizer.get_vocabulary() == ["one two", "z >"]
+    assert np.allclose(transformed, [1, 2])

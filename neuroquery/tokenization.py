@@ -4,7 +4,6 @@ from xml.sax.saxutils import escape
 
 from scipy import sparse
 import regex
-import nltk
 import sklearn
 from sklearn.utils.extmath import safe_sparse_dot
 from sklearn.feature_extraction.text import CountVectorizer
@@ -45,9 +44,6 @@ _DIFFERENT_WORDS = {
     ("covert attention", "overt attention"),
 }
 
-_porter_stemmer = nltk.PorterStemmer().stem
-_word_net_lemmatizer = nltk.stem.WordNetLemmatizer().lemmatize
-
 
 def _identity(arg):
     return arg
@@ -57,7 +53,7 @@ def nltk_stop_words():
     with open(
         str(pathlib.Path(__file__).parent / "data" / "nltk_stop_words.txt")
     ) as f:
-        words = {l.strip() for l in f}.difference({""})
+        words = {line.strip() for line in f}.difference({""})
     return words
 
 
@@ -94,9 +90,19 @@ def _get_stemmer(stemming_kind):
     if stemming_kind == "identity":
         return _identity
     if stemming_kind == "porter_stemmer":
-        return _porter_stemmer
+        try:
+            import nltk
+        except ImportError:
+            raise ImportError(
+                "nltk must be installed to use the Porter stemmer")
+        return nltk.PorterStemmer().stem
     if stemming_kind == "wordnet_lemmatizer":
-        return _word_net_lemmatizer
+        try:
+            import nltk
+        except ImportError:
+            raise ImportError(
+                "nltk must be installed to use the WordNet lemmatizer")
+        return nltk.stem.WordNetLemmatizer().lemmatize
     raise ValueError('invalid value for "stemming_kind".')
 
 
@@ -216,7 +222,7 @@ def _extract_phrases(phrase_map, sentence, out_of_voc):
 
 class PhraseExtractor(object):
     def __init__(self, phrases, out_of_voc="ignore"):
-        self.phrases_ = phrases
+        self.phrases_ = set(phrases)
         self.out_of_voc_ = out_of_voc
         self._phrase_map = _build_phrase_map(phrases)
         self.phrase_positions = None
@@ -491,7 +497,6 @@ def tokenizing_pipeline_from_vocabulary(
     token_pattern=WORD_PATTERN,
     as_tuples=False,
 ):
-    vocabulary = string_sequence_to_tuples(vocabulary)
     if frequencies is None:
         frequencies = np.ones(len(vocabulary))
     tokenizer = Tokenizer(token_pattern)
@@ -505,6 +510,7 @@ def tokenizing_pipeline_from_vocabulary(
     )
     phrases = {tuple(std(phrase)) for phrase in vocabulary}.difference({()})
     phrase_extractor = PhraseExtractor(phrases, out_of_voc=out_of_voc)
+    vocabulary = string_sequence_to_tuples(vocabulary)
     if voc_mapping == "auto":
         voc_mapping = make_vocabulary_mapping(
             vocabulary, frequencies, stemming=stemming
