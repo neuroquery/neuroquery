@@ -3,6 +3,7 @@ import pathlib
 import tempfile
 import zipfile
 import shutil
+import zlib
 
 import requests
 
@@ -72,12 +73,19 @@ def fetch_peak_coordinates(data_dir=None):
         return str(out_file)
     print("Downloading coordinates")
     resp = requests.get(
-        "https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
-        "master/training_data/coordinates.csv"
+        "https://raw.githubusercontent.com/neuroquery/neuroquery_data/master/data/data-neuroquery_version-1_coordinates.tsv.gz"
     )
     resp.raise_for_status()
+    content = zlib.decompress(resp.content, 15 + 32)
+    content_lines = content.split(b"\n")
+    content_lines_tabs = [line.split(b"\t") for line in content_lines]
+
     out_file = str(out_file)
+
     with open(out_file, "wb") as f:
-        f.write(resp.content)
+        for line in content_lines_tabs:
+            for item in line:
+                f.write(item + b",")
+            f.write(b"\n")
     print("Downloaded.")
     return out_file
