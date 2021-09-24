@@ -4,7 +4,9 @@ import tempfile
 import zipfile
 import shutil
 import zlib
+import io
 
+import pandas as pd
 import requests
 
 
@@ -73,19 +75,20 @@ def fetch_peak_coordinates(data_dir=None):
         return str(out_file)
     print("Downloading coordinates")
     resp = requests.get(
-        "https://raw.githubusercontent.com/neuroquery/neuroquery_data/master/data/data-neuroquery_version-1_coordinates.tsv.gz"
+        "https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
+        "master/data/data-neuroquery_version-1_coordinates.tsv.gz"
     )
     resp.raise_for_status()
-    content = zlib.decompress(resp.content, 15 + 32)
-    content_lines = content.split(b"\n")
-    content_lines_tabs = [line.split(b"\t") for line in content_lines]
-
-    out_file = str(out_file)
-
-    with open(out_file, "wb") as f:
-        for line in content_lines_tabs:
-            for item in line:
-                f.write(item + b",")
-            f.write(b"\n")
+    content = zlib.decompress(resp.content, wbits=32 + 15)
+    # The wbits parameter controls the size of the history buffer
+    # (or “window size”), and what header and trailer format is expected.
+    # It is similar to the parameter for compressobj(), but accepts more
+    # ranges of values...
+    # +40 to +47 = 32 + (8 to 15): Uses the low 4 bits of the value as the
+    # window size logarithm, and automatically accepts either the zlib or
+    # gzip format.
+    content_buf = io.BytesIO(content)
+    df = pd.read_csv(content_buf, sep="\t")
+    df.to_csv(str(out_file), index=False)
     print("Downloaded.")
     return out_file
