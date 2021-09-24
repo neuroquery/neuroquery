@@ -80,13 +80,12 @@ def fetch_peak_coordinates(data_dir=None):
     )
     resp.raise_for_status()
     content = zlib.decompress(resp.content, wbits=32 + 15)
-    # The wbits parameter controls the size of the history buffer
-    # (or “window size”), and what header and trailer format is expected.
-    # It is similar to the parameter for compressobj(), but accepts more
-    # ranges of values...
+    # from the zlib docs (https://docs.python.org/3/library/zlib.html):
+    # "The wbits parameter controls the size of the history buffer (or “window
+    # size”), and what header and trailer format is expected...
     # +40 to +47 = 32 + (8 to 15): Uses the low 4 bits of the value as the
     # window size logarithm, and automatically accepts either the zlib or
-    # gzip format.
+    # gzip format."
     content_buf = io.BytesIO(content)
     df = pd.read_csv(content_buf, sep="\t")
     df.to_csv(str(out_file), index=False)
