@@ -3,7 +3,10 @@ import pathlib
 import tempfile
 import zipfile
 import shutil
+import zlib
+import io
 
+import pandas as pd
 import requests
 
 
@@ -73,11 +76,18 @@ def fetch_peak_coordinates(data_dir=None):
     print("Downloading coordinates")
     resp = requests.get(
         "https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
-        "master/training_data/coordinates.csv"
+        "master/data/data-neuroquery_version-1_coordinates.tsv.gz"
     )
     resp.raise_for_status()
-    out_file = str(out_file)
-    with open(out_file, "wb") as f:
-        f.write(resp.content)
+    content = zlib.decompress(resp.content, wbits=32 + 15)
+    # from the zlib docs (https://docs.python.org/3/library/zlib.html):
+    # "The wbits parameter controls the size of the history buffer (or “window
+    # size”), and what header and trailer format is expected...
+    # +40 to +47 = 32 + (8 to 15): Uses the low 4 bits of the value as the
+    # window size logarithm, and automatically accepts either the zlib or
+    # gzip format."
+    content_buf = io.BytesIO(content)
+    df = pd.read_csv(content_buf, sep="\t")
+    df.to_csv(str(out_file), index=False)
     print("Downloaded.")
     return out_file

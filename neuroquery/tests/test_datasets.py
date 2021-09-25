@@ -3,15 +3,15 @@ import pathlib
 from unittest import mock
 import pytest
 
+import pandas as pd
+
 from neuroquery import encoding
 from neuroquery import datasets
 
 
 class _FileResponse(object):
     def __init__(self, data_file):
-        self.data_file = str(
-            pathlib.Path(__file__).parent / "data" / data_file
-        )
+        self.data_file = str(pathlib.Path(__file__).parent / "data" / data_file)
         self.status_code = 200
         with open(self.data_file, "rb") as f:
             self.content = f.read()
@@ -54,13 +54,12 @@ def test_get_neuroquery_data_dir():
 
 
 def test_fetch_peak_coordinates():
-    resp = mock.Mock()
-    resp.content = b"peak_coordinates_test"
+    resp = _FileResponse("sample-data-neuroquery_version-1_coordinates.tsv.gz")
     with mock.patch("requests.get", return_value=resp) as mock_get:
         with tempfile.TemporaryDirectory() as tmp_dir:
             coord_file = datasets.fetch_peak_coordinates(tmp_dir)
-            with open(coord_file) as f:
-                assert f.read() == "peak_coordinates_test"
+            df = pd.read_csv(coord_file)
+            assert df.shape == (20, 6)
             coord_file = datasets.fetch_peak_coordinates(tmp_dir)
             mock_get.assert_called_once()
 
