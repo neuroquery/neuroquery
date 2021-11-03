@@ -88,6 +88,7 @@ def fetch_peak_coordinates(data_dir=None):
     # gzip format."
     content_buf = io.BytesIO(content)
     df = pd.read_csv(content_buf, sep="\t")
+    df = df.rename(columns={'id': 'pmid'})
     df.to_csv(str(out_file), index=False)
     print("Downloaded.")
     return out_file

@@ -11,7 +11,9 @@ from neuroquery import datasets
 
 class _FileResponse(object):
     def __init__(self, data_file):
-        self.data_file = str(pathlib.Path(__file__).parent / "data" / data_file)
+        self.data_file = str(
+            pathlib.Path(__file__).parent / "data" / data_file
+        )
         self.status_code = 200
         with open(self.data_file, "rb") as f:
             self.content = f.read()
@@ -60,6 +62,7 @@ def test_fetch_peak_coordinates():
             coord_file = datasets.fetch_peak_coordinates(tmp_dir)
             df = pd.read_csv(coord_file)
             assert df.shape == (20, 6)
+            assert 'pmid' in df.columns
             coord_file = datasets.fetch_peak_coordinates(tmp_dir)
             mock_get.assert_called_once()
 
