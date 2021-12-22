@@ -22,6 +22,7 @@ resolution, the example requires around 60 mn and 14 GB of memory.
 # ---------------------
 import pathlib
 
+import numpy as np
 from scipy import sparse
 import pandas as pd
 from joblib import Memory
@@ -73,8 +74,10 @@ brain_maps = brain_maps[(brain_maps.values != 0).any(axis=1)]
 # Make sure TFIDF and brain maps are aligned (correspond to the same studies)
 
 pmids = brain_maps.index.intersection(corpus_metadata["pmid"])
-kept_idx = corpus_metadata["pmid"].isin(pmids)
-tfidf = tfidf.A[kept_idx, :]
+rindex = pd.Series(
+    np.arange(corpus_metadata).shape[0], index=corpus_metadata["pmid"]
+)
+tfidf = tfidf.A[rindex.loc[pmids].values, :]
 brain_maps = brain_maps.loc[pmids, :]
 
 ######################################################################
