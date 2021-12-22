@@ -17,13 +17,13 @@ WORD_PATTERN = r"(?:(?:\p{L}|\p{N}){2,}|[IVXivx0-9])"
 
 OUT_OF_VOC_TOKEN = (
     "https://gitlab.inria.fr/parietal/jerome_dockes/tree/"
-    "master/semantic_structure/corpus_manip/xml/ns#"
+    "main/semantic_structure/corpus_manip/xml/ns#"
     "out-of-vocabulary-token"
 )
 
 RARE_TOKEN = (
     "https://gitlab.inria.fr/parietal/jerome_dockes/tree/"
-    "master/semantic_structure/corpus_manip/xml/ns#"
+    "main/semantic_structure/corpus_manip/xml/ns#"
     "rare-token"
 )
 

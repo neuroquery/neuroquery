@@ -1,6 +1,6 @@
-[![Build Status](https://dev.azure.com/neuroquery/neuroquery/_apis/build/status/neuroquery.neuroquery?branchName=master)](https://dev.azure.com/neuroquery/neuroquery/_build/latest?definitionId=1&branchName=master) [![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/master/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery) 
+[![Build Status](https://dev.azure.com/neuroquery/neuroquery/_apis/build/status/neuroquery.neuroquery?branchName=main)](https://dev.azure.com/neuroquery/neuroquery/_build/latest?definitionId=1&branchName=main) [![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/main/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery) 
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/neuroquery/neuroquery.git/master?filepath=examples)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/neuroquery/neuroquery.git/main?filepath=examples)
 
 # NeuroQuery
 
@@ -19,7 +19,7 @@ applications.
 
 ## Getting started
 
-[Quick demo](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/master/examples/minimal_example.ipynb)
+[Quick demo](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/main/examples/minimal_example.ipynb)
 
 ### Dependencies
 
@@ -44,7 +44,7 @@ pip install neuroquery
 ### Usage
 
 In the `examples` folder, 
-[`minimal_example.ipynb`](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/master/examples/minimal_example.ipynb)
+[`minimal_example.ipynb`](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/main/examples/minimal_example.ipynb)
 shows basic usage of `neuroquery`.
 
 `neuroquery` has a function to download a trained model so that users can get
@@ -63,6 +63,6 @@ view_img(
 
 `neuroquery` also provides classes to train new models from scientific
 publications' text and stereotactic peak activation coordinates (see
-[`training_neuroquery.ipynb`](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/master/examples/training_neuroquery.ipynb)
+[`training_neuroquery.ipynb`](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/main/examples/training_neuroquery.ipynb)
 in the examples).
 

@@ -47,7 +47,7 @@ def _download_neuroquery_model(data_dir, model_name):
     print("Downloaded.")
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_dir = pathlib.Path(tmp_dir)
-        zip_path = str(tmp_dir / "neuroquery_data_master.zip")
+        zip_path = str(tmp_dir / "neuroquery_data_main.zip")
         with open(zip_path, "wb") as f:
             f.write(resp.content)
         with zipfile.ZipFile(zip_path) as zip_f:
@@ -76,7 +76,7 @@ def fetch_peak_coordinates(data_dir=None):
     print("Downloading coordinates")
     resp = requests.get(
         "https://raw.githubusercontent.com/neuroquery/neuroquery_data/"
-        "master/data/data-neuroquery_version-1_coordinates.tsv.gz"
+        "main/data/data-neuroquery_version-1_coordinates.tsv.gz"
     )
     resp.raise_for_status()
     content = zlib.decompress(resp.content, wbits=32 + 15)
