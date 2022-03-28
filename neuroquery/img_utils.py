@@ -87,7 +87,9 @@ def coordinates_to_maps(
                 for i, (pmid, article) in enumerate(all_articles)
             )
             output.flush()
-            return pd.DataFrame(np.array(output), index=pmids), masker
+            result = pd.DataFrame(np.array(output), index=pmids)
+            del output
+    return result, masker
 
 
 def iter_coordinates_to_maps(
