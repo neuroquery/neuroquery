@@ -71,17 +71,24 @@ def coordinates_to_maps(
     n_articles, n_voxels = len(pmids), image.get_data(masker.mask_img_).sum()
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_file = Path(tmp_dir).joinpath("brain_maps_memmap.dat")
-        output = np.memmap(
-            tmp_file, mode="w+", dtype=np.float64, shape=(n_articles, n_voxels)
-        )
-        all_articles = coordinates.groupby("pmid", sort=True)
-        Parallel(n_jobs, verbose=1)(
-            delayed(_coords_to_masked_map)(
-                article.loc[:, ["x", "y", "z"]].values, masker, fwhm, output, i
+        with open(tmp_file, "w+b") as f:
+            output = np.memmap(
+                f, mode="w+", dtype=np.float64, shape=(n_articles, n_voxels)
             )
-            for i, (pmid, article) in enumerate(all_articles)
-        )
-        return pd.DataFrame(np.array(output), index=pmids), masker
+            all_articles = coordinates.groupby("pmid", sort=True)
+            Parallel(n_jobs, verbose=1)(
+                delayed(_coords_to_masked_map)(
+                    article.loc[:, ["x", "y", "z"]].values,
+                    masker,
+                    fwhm,
+                    output,
+                    i,
+                )
+                for i, (pmid, article) in enumerate(all_articles)
+            )
+            output.flush()
+            return pd.DataFrame(np.array(output), index=pmids), masker
+
 
 def iter_coordinates_to_maps(
     coordinates, mask_img=None, target_affine=(4, 4, 4), fwhm=9.0
