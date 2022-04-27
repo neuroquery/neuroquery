@@ -1,5 +1,10 @@
+import tempfile
+from pathlib import Path
+import contextlib
+
 import numpy as np
 import pandas as pd
+from joblib import delayed, Parallel
 
 from nilearn import image, input_data
 from nilearn.datasets import load_mni152_brain_mask
@@ -53,22 +58,63 @@ def gaussian_coord_smoothing(
     return masker.inverse_transform(masker.transform(img).squeeze())
 
 
-def coordinates_to_maps(
-    coordinates, mask_img=None, target_affine=(4, 4, 4), fwhm=9.0
-):
-    print(
-        "Transforming {} coordinates for {} articles".format(
-            coordinates.shape[0], len(set(coordinates["pmid"]))
-        )
+def _coords_to_masked_map(coordinates, masker, fwhm, output, idx):
+    peaks_img = coords_to_peaks_img(coordinates, mask_img=masker.mask_img_)
+    img = image.smooth_img(peaks_img, fwhm=fwhm)
+    output[idx] = masker.transform(img).squeeze()
+
+
+def _prepare_memmap(output_memmap_file, shape, context):
+    if output_memmap_file is None:
+        tmp_dir = context.enter_context(tempfile.TemporaryDirectory())
+        output_memmap_file = str(Path(tmp_dir).joinpath("memmap.dat"))
+        return_memmap = False
+    else:
+        output_memmap_file = str(output_memmap_file)
+        return_memmap = True
+    output = np.memmap(
+        output_memmap_file,
+        mode="w+",
+        dtype=np.float32,
+        shape=shape,
     )
+    if not return_memmap:
+        context.enter_context(contextlib.closing(output._mmap))
+    return output, return_memmap
+
+
+def coordinates_to_maps(
+    coordinates,
+    mask_img=None,
+    target_affine=(4, 4, 4),
+    fwhm=9.0,
+    n_jobs=1,
+    output_memmap_file=None,
+):
     masker = get_masker(mask_img=mask_img, target_affine=target_affine)
-    images, img_pmids = [], []
-    for pmid, img in iter_coordinates_to_maps(
-        coordinates, mask_img=masker, fwhm=fwhm
-    ):
-        images.append(masker.transform(img).ravel())
-        img_pmids.append(pmid)
-    return pd.DataFrame(images, index=img_pmids), masker
+    pmids = np.unique(coordinates["pmid"].values)
+    shape = len(pmids), image.get_data(masker.mask_img_).sum()
+    with contextlib.ExitStack() as context:
+        output, return_memmap = _prepare_memmap(
+            output_memmap_file, shape, context
+        )
+        all_articles = coordinates.groupby("pmid", sort=True)
+        Parallel(n_jobs, verbose=1)(
+            delayed(_coords_to_masked_map)(
+                article.loc[:, ["x", "y", "z"]].values,
+                masker,
+                fwhm,
+                output,
+                i,
+            )
+            for i, (pmid, article) in enumerate(all_articles)
+        )
+        output.flush()
+        if return_memmap:
+            result = pd.DataFrame(output, index=pmids)
+        else:
+            result = pd.DataFrame(np.array(output), index=pmids)
+        return result, masker
 
 
 def iter_coordinates_to_maps(
