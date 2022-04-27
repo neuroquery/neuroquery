@@ -98,7 +98,7 @@ def _coordinates_to_maps(
     ):
         images.append(masker.transform(img).ravel().astype("float32"))
         img_pmids.append(pmid)
-    return pd.DataFrame(images, index=img_pmids), masker
+    return pd.DataFrame(images, index=img_pmids, dtype="float32"), masker
 
 
 @pytest.mark.parametrize("persist_memmap", [True, False])
