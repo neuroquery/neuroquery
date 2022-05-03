@@ -1,5 +1,9 @@
+import tempfile
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
+from joblib import delayed, Parallel
 
 from nilearn import image, input_data
 from nilearn.datasets import load_mni152_brain_mask
@@ -53,23 +57,31 @@ def gaussian_coord_smoothing(
     return masker.inverse_transform(masker.transform(img).squeeze())
 
 
-def coordinates_to_maps(
-    coordinates, mask_img=None, target_affine=(4, 4, 4), fwhm=9.0
-):
-    print(
-        "Transforming {} coordinates for {} articles".format(
-            coordinates.shape[0], len(set(coordinates["pmid"]))
-        )
-    )
-    masker = get_masker(mask_img=mask_img, target_affine=target_affine)
-    images, img_pmids = [], []
-    for pmid, img in iter_coordinates_to_maps(
-        coordinates, mask_img=masker, fwhm=fwhm
-    ):
-        images.append(masker.transform(img).ravel())
-        img_pmids.append(pmid)
-    return pd.DataFrame(images, index=img_pmids), masker
+def _coords_to_masked_map(coordinates, masker, fwhm, output, idx):
+    peaks_img = coords_to_peaks_img(coordinates, mask_img=masker.mask_img_)
+    img = image.smooth_img(peaks_img, fwhm=fwhm)
+    output[idx] = masker.transform(img).squeeze()
 
+
+def coordinates_to_maps(
+    coordinates, mask_img=None, target_affine=(4, 4, 4), fwhm=9.0, n_jobs=1
+):
+    masker = get_masker(mask_img=mask_img, target_affine=target_affine)
+    pmids = np.unique(coordinates["pmid"].values)
+    n_articles, n_voxels = len(pmids), image.get_data(masker.mask_img_).sum()
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_file = Path(tmp_dir).joinpath("brain_maps_memmap.dat")
+        output = np.memmap(
+            tmp_file, mode="w+", dtype=np.float64, shape=(n_articles, n_voxels)
+        )
+        all_articles = coordinates.groupby("pmid", sort=True)
+        Parallel(n_jobs, verbose=1)(
+            delayed(_coords_to_masked_map)(
+                article.loc[:, ["x", "y", "z"]].values, masker, fwhm, output, i
+            )
+            for i, (pmid, article) in enumerate(all_articles)
+        )
+        return pd.DataFrame(np.array(output), index=pmids), masker
 
 def iter_coordinates_to_maps(
     coordinates, mask_img=None, target_affine=(4, 4, 4), fwhm=9.0
