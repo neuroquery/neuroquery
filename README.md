@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/main/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery) 
+[![build](https://github.com/neuroquery/neuroquery/actions/workflows/testing.yml/badge.svg)](https://github.com/neuroquery/neuroquery/actions/workflows/testing.yml)[![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/main/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery)
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/neuroquery/neuroquery.git/main?filepath=examples)
 
