@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from nilearn.input_data import NiftiSpheresMasker
 from nilearn.image import get_data
+from neuroquery._compat import maskers
 
 import pytest
 
@@ -48,7 +48,7 @@ def test_coords_to_voxels():
 def test_gaussian_coord_smoothing():
     coords = [(0.0, 0.0, 0.0), (10.0, -10.0, 30.0)]
     computed_img = img_utils.gaussian_coord_smoothing(coords)
-    masker = NiftiSpheresMasker(coords + [(-10.0, 10.0, -30)]).fit()
+    masker = maskers.NiftiSpheresMasker(coords + [(-10.0, 10.0, -30)]).fit()
     values = masker.transform(computed_img)[0]
     assert (values[:2] > get_data(computed_img).max() / 2.0).all()
     assert values[-1] == pytest.approx(0.0)

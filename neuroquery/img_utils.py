@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
 
-from nilearn import image, input_data
-from nilearn.datasets import load_mni152_brain_mask
+from nilearn import image
+from neuroquery._compat import maskers, load_mni152_brain_mask
 
 
 def get_masker(mask_img=None, target_affine=None):
-    if isinstance(mask_img, input_data.NiftiMasker):
+    if isinstance(mask_img, maskers.NiftiMasker):
         return mask_img
     if mask_img is None:
         mask_img = load_mni152_brain_mask()
@@ -18,7 +18,7 @@ def get_masker(mask_img=None, target_affine=None):
         mask_img = image.resample_img(
             mask_img, target_affine=target_affine, interpolation="nearest"
         )
-    masker = input_data.NiftiMasker(mask_img=mask_img).fit()
+    masker = maskers.NiftiMasker(mask_img=mask_img).fit()
     return masker
 
 
