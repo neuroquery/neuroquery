@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/neuroquery/neuroquery/_apis/build/status/neuroquery.neuroquery?branchName=main)](https://dev.azure.com/neuroquery/neuroquery/_build/latest?definitionId=1&branchName=main) [![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/main/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery) 
+[![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/main/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery) 
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/neuroquery/neuroquery.git/main?filepath=examples)
 
