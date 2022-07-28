@@ -1,0 +1,45 @@
+name: "build"
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  run_tests:
+    name: ${{ matrix.os }} with Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        python-version: ["3.7", "3.10"]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+        name: "setup python"
+      - name: "install"
+        run: pip install .[dev]
+      - name: "run tests"
+        run: pytest --cov=neuroquery --cov-report=xml --cov-report=term tests
+      - uses: codecov/codecov-action@v2
+        if: success()
+        name: "upload coverage to CodeCov"
+
+  run_tests_ubuntu_old_dependencies:
+    name: "Ubuntu with Python 3.7 min dependencies"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.7"
+        name: "setup python"
+      - name: "install tox"
+        run: pip install tox
+      - name: "run tests"
+        run: tox -e py37-old
