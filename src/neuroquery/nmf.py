@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 def _smoothing_matrix_sqrt(X, n_components=300):
     nmf = NMF(
-        init="nndsvda",
+        init=None,
         n_components=n_components,
         max_iter=200,
         random_state=0,
