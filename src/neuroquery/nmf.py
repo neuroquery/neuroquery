@@ -8,7 +8,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 def _smoothing_matrix_sqrt(X, n_components=300):
-    nmf = NMF(
+    params = dict(
         init=None,
         n_components=n_components,
         max_iter=200,
@@ -17,6 +17,11 @@ def _smoothing_matrix_sqrt(X, n_components=300):
         l1_ratio=0.1,
         verbose=0,
     )
+    try:
+        nmf = NMF(**params)
+    except TypeError:
+        params["alpha_W"] = params.pop("alpha")
+    nmf = NMF(**params)
     u = nmf.fit_transform(X)
     v = nmf.components_.T
     z = np.linalg.norm(u, axis=0)
