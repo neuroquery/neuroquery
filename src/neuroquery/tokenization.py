@@ -32,18 +32,12 @@ _TERM_BLUE = "\033[94m"
 _TERM_GREEN = "\033[92m"
 _TERM_ENDC = "\033[0m"
 
-# not synonyms despite high jaro-winkler similarity
-_DIFFERENT_WORDS = {
-    ("addiction", "addition"),
-    ("imitation", "limitation"),
-    ("preference", "reference"),
-    ("asymmetric", "symmetric"),
-    ("mediation", "medication"),
-    ("mediation", "meditation"),
-    ("preferential", "referential"),
-    ("asymptomatic", "symptomatic"),
-    ("covert attention", "overt attention"),
-}
+_VOC_MAPPING_WARNING = (
+    "Creating a vocabulary mapping is not supported anymore. "
+    "voc_mapping='auto' now results in an empty vocabulary "
+    "mapping, ie keeping the full vocabulary: it is the same as "
+    "voc_mapping={}"
+)
 
 
 def _identity(arg):
@@ -515,9 +509,7 @@ def tokenizing_pipeline_from_vocabulary(
     phrase_extractor = PhraseExtractor(phrases, out_of_voc=out_of_voc)
     vocabulary = string_sequence_to_tuples(vocabulary)
     if voc_mapping == "auto":
-        warnings.warn(
-            "Creating the vocabulary mapping is not supported anymore."
-        )
+        warnings.warn(_VOC_MAPPING_WARNING)
         voc_mapping = {}
     voc_mapper = VocabularyMapping(voc_mapping)
     return TokenizingPipeline(
@@ -578,6 +570,8 @@ def _save_voc_mapping(vocabulary_file, voc_mapping, stemming="identity"):
 def load_voc_mapping(
     vocabulary_file, stemming="identity", token_pattern=WORD_PATTERN
 ):
+    # kept for backwards-compatibility only
+    del token_pattern
     voc_mapping_file = pathlib.Path(
         "{}_voc_mapping_{}.json".format(vocabulary_file, stemming)
     )
@@ -590,15 +584,8 @@ def load_voc_mapping(
                 string_sequence_to_tuples(mapping.values()),
             )
         )
-    warnings.warn(
-        "Creating the vocabulary mapping is not supported anymore."
-    )
-    voc_mapping = {}
-    voc_mapping_file = _save_voc_mapping(
-        vocabulary_file, voc_mapping, stemming=stemming
-    )
-    print("voc mapping saved in {}".format(voc_mapping_file))
-    return voc_mapping
+    warnings.warn(_VOC_MAPPING_WARNING)
+    return {}
 
 
 def tuple_to_string(phrase, delimiter="\u0020"):
