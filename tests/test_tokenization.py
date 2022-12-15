@@ -233,10 +233,11 @@ def test_tokenizing_pipeline_from_bad_vocabulary(use_freq):
     if use_freq:
         freq = np.arange(len(voc))
     tok = tokenization.tokenizing_pipeline_from_vocabulary(
-        voc, frequencies=freq)
+        voc, frequencies=freq
+    )
     assert tok.get_full_vocabulary() == ["big ben", "london", "one three"]
     if freq is None:
-        assert np.allclose(tok.get_frequencies(), 1.)
+        assert np.allclose(tok.get_frequencies(), 1.0)
     else:
         assert np.allclose(tok.get_frequencies(), [1, 2, 5])
 
@@ -326,43 +327,6 @@ def test_highlight_text():
         '<html><head><meta charset="UTF-8"><title>highlighted '
         "text</title></head><body><span>.+ --</span></body></html>"
     )
-
-
-def test_make_voc_mapping():
-    voc = [
-        ("experiment",),
-        ("experiments",),
-        ("experience"),
-        ("experimentss",),
-    ]
-    freq = [1.0, 0.5, 0.2, 0.01]
-    voc_mapping = tokenization.make_vocabulary_mapping(voc, freq)
-    assert voc_mapping == {
-        ("experiments",): ("experiment",),
-        ("experimentss",): ("experiment",),
-    }
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        df = pd.DataFrame(
-            {"term": tokenization.tuple_sequence_to_strings(voc), "freq": freq}
-        )
-        voc_file = os.path.join(tmp_dir, "voc.csv")
-        df.to_csv(voc_file, header=None, index=False)
-        # voc_mapping = tokenization.load_voc_mapping(voc_file)
-        # assert voc_mapping == {('experiments',): ('experiment',)}
-        pipe = tokenization.tokenizing_pipeline_from_vocabulary_file(
-            voc_file, voc_mapping="auto"
-        )
-        assert pipe.vocabulary_mapping_.voc_mapping == {
-            ("experiments",): ("experiment",),
-            ("experimentss",): ("experiment",),
-        }
-        pipe = tokenization.tokenizing_pipeline_from_vocabulary(
-            voc, voc_mapping="auto", frequencies=freq
-        )
-        assert pipe.vocabulary_mapping_.voc_mapping == {
-            ("experiments",): ("experiment",),
-            ("experimentss",): ("experiment",),
-        }
 
 
 def test_unigrams():

@@ -1,6 +1,7 @@
 import json
 import pathlib
 from xml.sax.saxutils import escape
+import warnings
 
 from scipy import sparse
 import regex
@@ -94,14 +95,16 @@ def _get_stemmer(stemming_kind):
             import nltk
         except ImportError:
             raise ImportError(
-                "nltk must be installed to use the Porter stemmer")
+                "nltk must be installed to use the Porter stemmer"
+            )
         return nltk.PorterStemmer().stem
     if stemming_kind == "wordnet_lemmatizer":
         try:
             import nltk
         except ImportError:
             raise ImportError(
-                "nltk must be installed to use the WordNet lemmatizer")
+                "nltk must be installed to use the WordNet lemmatizer"
+            )
         return nltk.stem.WordNetLemmatizer().lemmatize
     raise ValueError('invalid value for "stemming_kind".')
 
@@ -512,9 +515,10 @@ def tokenizing_pipeline_from_vocabulary(
     phrase_extractor = PhraseExtractor(phrases, out_of_voc=out_of_voc)
     vocabulary = string_sequence_to_tuples(vocabulary)
     if voc_mapping == "auto":
-        voc_mapping = make_vocabulary_mapping(
-            vocabulary, frequencies, stemming=stemming
+        warnings.warn(
+            "Creating the vocabulary mapping is not supported anymore."
         )
+        voc_mapping = {}
     voc_mapper = VocabularyMapping(voc_mapping)
     return TokenizingPipeline(
         voc_mapper,
@@ -586,10 +590,10 @@ def load_voc_mapping(
                 string_sequence_to_tuples(mapping.values()),
             )
         )
-    phrases = load_vocabulary(vocabulary_file, token_pattern=token_pattern)
-    freq = [p[1] for p in phrases]
-    phrases = [p[0] for p in phrases]
-    voc_mapping = make_vocabulary_mapping(phrases, freq, stemming=stemming)
+    warnings.warn(
+        "Creating the vocabulary mapping is not supported anymore."
+    )
+    voc_mapping = {}
     voc_mapping_file = _save_voc_mapping(
         vocabulary_file, voc_mapping, stemming=stemming
     )
@@ -672,59 +676,6 @@ def add_unigram_frequencies(frequencies, unigram_op=None, voc=None):
     if unigram_op is None:
         unigram_op = unigram_operator(voc)
     return safe_sparse_dot(frequencies, unigram_op)
-
-
-def _jaro_w(a, b, jw):
-    a_s, b_s = a.split(), b.split()
-    if len(a_s) != len(b_s):
-        return jw(a, b, 1 / 50.0)
-    return min(jw(a_i, b_i, 1 / 10.0) for (a_i, b_i) in zip(a_s, b_s))
-
-
-def _similar_words(voc):
-    from Levenshtein import jaro_winkler as jw
-
-    s = [_jaro_w(a, b, jw) for a in voc for b in voc]
-    ss = np.reshape(s, (len(voc), len(voc)))
-    del s
-    pairs = np.nonzero(ss >= 0.96)
-    pairs = [(voc[a], voc[b]) for (a, b) in zip(*pairs)]
-    pairs = {
-        (a, b)
-        for (a, b) in pairs
-        if (a < b)
-        and (not regex.match(r".*(\d|\b[ivx]+\b).*", a))
-        and (not regex.match(r".*(\d|\b[ivx]+\b).*", b))
-    }
-    return pairs.difference(_DIFFERENT_WORDS)
-
-
-def _choose_pairs(pairs, freq):
-    # TODO: fix
-    pairs = sorted(pairs, key=lambda p: -max(freq[p[0]], freq[p[1]]))
-    mapping = {}
-    for a, b in pairs:
-        if freq[a] > freq[b]:
-            a, b = b, a
-        if b == a + "s":
-            a, b = b, a
-        if b in mapping:
-            mapping[a] = mapping[b]
-        else:
-            mapping[a] = b
-    return mapping
-
-
-def make_vocabulary_mapping(phrases, frequencies, stemming="identity"):
-    standardizer = Standardizer(stemming=stemming)
-    if frequencies is None:
-        frequencies = np.ones(len(phrases))
-    freq = pd.DataFrame(frequencies, columns=["freq"])
-    freq["std_phrase"] = [" ".join(standardizer(p)) for p in phrases]
-    freq = freq.groupby("std_phrase").sum()["freq"]
-    pairs = _similar_words(freq.index)
-    mapping = _choose_pairs(pairs, freq)
-    return {string_to_tuple(k): string_to_tuple(v) for k, v in mapping.items()}
 
 
 class TextVectorizer(object):

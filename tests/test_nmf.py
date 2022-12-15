@@ -19,7 +19,7 @@ def test_covariance_smoothing():
     op = nmf.CovarianceSmoothing(n_components=5).fit(X)
     smoothed = op.transform(X)
     assert smoothed.shape == X.shape
-    assert np.allclose(smoothed, X, rtol=0.2, atol=0.2)
+    assert np.allclose(smoothed, X, rtol=0.25, atol=0.25)
     assert np.allclose(
         1.0, np.linalg.norm(op.normalized_V_.dot(op.V_.T), axis=1)
     )
