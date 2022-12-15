@@ -1,0 +1,10 @@
+1.0.3
+
+  - fix error NMF TypeError after scikit-learn release 1.2.0 (parameter name changed)
+
+  - remove support for creating a vocabulary mapping (merging similar terms);
+    now one can (i) use the default one for the existing neuroquery vocabulary,
+    (ii) use the empty mapping (do not merge any terms) or (iii) input a
+    user-defined vocabulary mapping
+
+  - remove dependency on python-Levenshtein
