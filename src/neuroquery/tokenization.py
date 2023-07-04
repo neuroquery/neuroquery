@@ -731,7 +731,7 @@ class TextVectorizer(object):
         self.counter_ = CountVectorizer(
             analyzer=self.tokenizer,
             vocabulary=self.tokenizer.get_vocabulary(),
-            min_df=0,
+            min_df=0.0,
         ).fit([])
         if self.use_idf:
             self.idf_ = -np.log(self.tokenizer.get_frequencies()) + 1
