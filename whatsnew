@@ -1,3 +1,7 @@
+1.0.4
+
+  - tiny patch to work with most recent scikit-learn version
+
 1.0.3
 
   - fix error NMF TypeError after scikit-learn release 1.2.0 (parameter name changed)
