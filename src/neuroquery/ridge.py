@@ -41,6 +41,7 @@ def _gcv(U, s, Y, intercept, alphas):
 
 
 def ridge_gcv(X, Y, alphas=_DEFAULT_ALPHAS, feat_penalty=None):
+    alphas = alphas.astype(X.dtype)
     X, X_mean, Y, intercept = _preprocess(X, Y, feat_penalty)
     U, s, Vh = linalg.svd(X, full_matrices=False)
     V = Vh.T
