@@ -66,7 +66,7 @@ class CovarianceSmoothing(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         if sparse.issparse(X):
-            X = X.A
+            X = X.toarray()
         s = np.einsum(
             "ij,jk,lk", X, self.normalized_V_, self.V_, optimize=True
         )

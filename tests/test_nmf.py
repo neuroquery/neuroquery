@@ -26,7 +26,7 @@ def test_covariance_smoothing():
     a = sparse.csr_matrix(((1.0,), (0,), (0, 1)), shape=(1, 7))
     s = op.transform(a)
     assert np.allclose(
-        s, a.A.ravel() * 0.9 + 0.1 * op.normalized_V_.dot(op.V_.T)[0]
+        s, a.toarray().ravel() * 0.9 + 0.1 * op.normalized_V_.dot(op.V_.T)[0]
     )
     smoothed = nmf.CovarianceSmoothing(
         n_components=5, smoothing_weight=0.0
