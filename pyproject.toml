@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = [
     "joblib (>=1.1.1)",
-    "nilearn (>=0.6.0)"
+    "nilearn (>=0.6.0)",
     "lxml",
     "numpy (>=1.17.3)",
     "pandas (>=1.5.3)",
