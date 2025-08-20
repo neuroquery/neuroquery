@@ -1,3 +1,53 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "neuroquery"
+dynamic = ["version"]
+description = "Meta-analysis of neuroimaging studies."
+readme = "README.md"
+requires-python = ">=3.10"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Jérôme Dockès", email = "jerome@dockes.org"},
+]
+keywords = ["neuroimaging", "meta-analysis"]
+classifiers = [
+    "License :: OSI Approved :: BSD 3-Clause License",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "joblib (>=1.1.1)",
+    "nilearn (>=0.6.0)"
+    "lxml",
+    "numpy (>=1.17.3)",
+    "pandas (>=1.5.3)",
+    "requests",
+    "regex",
+    "scikit-learn (>=1.2.1)",
+    "scipy (>=1.3.2)",
+]
+
+[project.urls]
+"Source code" = "https://github.com/neuroquery/neuroquery"
+
+[project.optional-dependencies]
+dev = [
+    "coverage",
+    "nltk (>=3.4.5)",
+    "pytest",
+    "pytest-cov",
+    "tox",
+]
+stemming = [
+    "nltk (>=3.4.5)",
+]
+
+[tool.hatch.version]
+path = "src/neuroquery/VERSION.txt"
+pattern = "^(?P<version>.*)$"
