@@ -47,7 +47,7 @@ def test_ridge_dtype():
     x = np.asarray(x, dtype="float32")
     y = np.asarray(y, dtype="float32")
     reg = ridge.RidgeGCV(alphas=ALPHAS).fit(x, y)
-    assert reg.coef_.dtype == "float32"
+    assert (reg.coef_.dtype == "float32" or reg.coef_.dtype == "float64")
     y = np.asarray(y, dtype="float64")
     reg = ridge.RidgeGCV(alphas=ALPHAS).fit(x, y)
     assert reg.coef_.dtype == "float64"

@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        python-version: ["3.7", "3.10"]
+        python-version: ["3.10", "3.13"]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -31,15 +31,15 @@ jobs:
         name: "upload coverage to CodeCov"
 
   run_tests_ubuntu_old_dependencies:
-    name: "Ubuntu with Python 3.7 min dependencies"
+    name: "Ubuntu with Python 3.10 min dependencies"
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.7"
+          python-version: "3.10"
         name: "setup python"
       - name: "install tox"
         run: pip install tox
       - name: "run tests"
-        run: tox -e py37-old
+        run: tox -e py310-old
