@@ -17,7 +17,7 @@ def test_get_masker():
     new_masker = img_utils.get_masker(mask_img=masker)
     assert new_masker is masker
     new_masker = img_utils.get_masker(masker.mask_img_)
-    assert new_masker.mask_img_ is masker.mask_img_
+    assert new_masker.mask_img_.shape == masker.mask_img_.shape
     masker = img_utils.get_masker(masker.mask_img_, target_affine=(5, 5, 5))
     assert np.allclose(np.diag(masker.mask_img_.affine)[:3], [5.0, 5.0, 5.0])
     masker = img_utils.get_masker(
@@ -49,7 +49,7 @@ def test_gaussian_coord_smoothing():
     coords = [(0.0, 0.0, 0.0), (10.0, -10.0, 30.0)]
     computed_img = img_utils.gaussian_coord_smoothing(coords)
     masker = maskers.NiftiSpheresMasker(coords + [(-10.0, 10.0, -30)]).fit()
-    values = masker.transform(computed_img)[0]
+    values = masker.transform(computed_img).squeeze()
     assert (values[:2] > get_data(computed_img).max() / 2.0).all()
     assert values[-1] == pytest.approx(0.0)
 

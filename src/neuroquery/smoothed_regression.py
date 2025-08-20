@@ -49,7 +49,7 @@ class SmoothedRegression(BaseEstimator, RegressorMixin):
 
     def fit(self, X, Y):
         if sparse.issparse(X):
-            X = X.A
+            X = X.toarray()
         self.smoothing_ = nmf.CovarianceSmoothing(
             n_components=self.n_components,
             smoothing_weight=self.smoothing_weight,

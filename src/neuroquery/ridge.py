@@ -72,6 +72,8 @@ def _get_variance(X, Y, coef, intercept, M):
 
 
 class RidgeGCV(LinearRegression):
+    positive = False
+
     def __init__(
         self, alphas=_DEFAULT_ALPHAS, feat_penalty=None, store_M=False
     ):
