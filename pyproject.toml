@@ -42,7 +42,6 @@ dev = [
     "nltk (>=3.4.5)",
     "pytest",
     "pytest-cov",
-    "tox",
 ]
 stemming = [
     "nltk (>=3.4.5)",
