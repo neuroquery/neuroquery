@@ -331,7 +331,7 @@ def test_highlight_text():
 
 def test_unigrams():
     voc = ["working memory", "brain", "memory"]
-    op = tokenization.unigram_operator(voc).A
+    op = tokenization.unigram_operator(voc).toarray()
     assert np.allclose(op, [[1.0, 0.0, 1.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
     freq = tokenization.add_unigram_frequencies([1, 1, 1], voc=voc)
     assert np.allclose(freq, [1, 1, 2])
@@ -341,17 +341,17 @@ def test_text_vectorizer():
     docs = ["attention Encoding-language", "routine fixation", "ab and action"]
     vect = tokenization.TextVectorizer.from_vocabulary_file(VOCABULARY_FILE)
     transformed = vect(docs)
-    assert np.allclose(transformed.A[2, :4], [0.83618742, 0.5484438, 0.0, 0.0])
+    assert np.allclose(transformed.toarray()[2, :4], [0.83618742, 0.5484438, 0.0, 0.0])
     vect = tokenization.TextVectorizer.from_vocabulary_file(
         VOCABULARY_FILE, use_idf=False, norm="l1", add_unigrams=False
     )
     transformed = vect(docs)
-    assert np.allclose(transformed.A[2, :4], [0.5, 0.5, 0.0, 0.0])
+    assert np.allclose(transformed.toarray()[2, :4], [0.5, 0.5, 0.0, 0.0])
     vect = tokenization.TextVectorizer.from_vocabulary(
         vect.get_vocabulary(), norm="l1"
     )
     transformed = vect(docs)
-    assert np.allclose(transformed.A[2, :4], [0.5, 0.5, 0.0, 0.0])
+    assert np.allclose(transformed.toarray()[2, :4], [0.5, 0.5, 0.0, 0.0])
     assert vect.get_feature_names() == vect.tokenizer.get_vocabulary()
     assert vect.get_full_vocabulary() == vect.tokenizer.get_full_vocabulary()
 
@@ -363,6 +363,6 @@ def test_text_vectorizer_non_whitespace_pattern():
         voc, token_pattern=pattern, use_idf=False, norm=None
     )
     text = ["something z > 10 z  >= z >  and one two"]
-    transformed = vectorizer.transform(text).A.ravel()
+    transformed = vectorizer.transform(text).toarray().ravel()
     assert vectorizer.get_vocabulary() == ["one two", "z >"]
     assert np.allclose(transformed, [1, 2])

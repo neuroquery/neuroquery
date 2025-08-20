@@ -142,7 +142,7 @@ class NeuroQueryModel:
         if vocabulary is None:
             vocabulary = self.full_vocabulary()
         if sparse.issparse(tfidf):
-            tfidf = tfidf.A.squeeze()
+            tfidf = tfidf.toarray().squeeze()
         similar = pd.Series(tfidf, index=vocabulary).sort_values(
             ascending=False
         )

@@ -77,7 +77,7 @@ pmids = brain_maps.index.intersection(corpus_metadata["pmid"])
 rindex = pd.Series(
     np.arange(corpus_metadata.shape[0]), index=corpus_metadata["pmid"]
 )
-tfidf = tfidf.A[rindex.loc[pmids].values, :]
+tfidf = tfidf.toarray()[rindex.loc[pmids].values, :]
 brain_maps = brain_maps.loc[pmids, :]
 
 ######################################################################
