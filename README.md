@@ -1,6 +1,5 @@
 [![build](https://github.com/neuroquery/neuroquery/actions/workflows/testing.yml/badge.svg)](https://github.com/neuroquery/neuroquery/actions/workflows/testing.yml)[![codecov](https://codecov.io/gh/neuroquery/neuroquery/branch/main/graph/badge.svg)](https://codecov.io/gh/neuroquery/neuroquery)
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/neuroquery/neuroquery.git/main?filepath=examples)
 
 # NeuroQuery
 
@@ -15,7 +14,7 @@ It can be used through a web interface: https://neuroquery.org
 Technical details and extensive validation are provided in [this paper](https://elifesciences.org/articles/53385).
 
 This Python package permits using NeuroQuery offline or integrating it in other
-applications. 
+applications.
 
 ## Getting started
 
@@ -43,7 +42,7 @@ pip install neuroquery
 
 ### Usage
 
-In the `examples` folder, 
+In the `examples` folder,
 [`minimal_example.ipynb`](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/main/examples/minimal_example.ipynb)
 shows basic usage of `neuroquery`.
 
@@ -65,4 +64,3 @@ view_img(
 publications' text and stereotactic peak activation coordinates (see
 [`training_neuroquery.ipynb`](https://nbviewer.jupyter.org/github/neuroquery/neuroquery/blob/main/examples/training_neuroquery.ipynb)
 in the examples).
-
